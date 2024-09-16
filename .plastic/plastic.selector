@@ -1,4 +1,4 @@
-repository "VR Room - 2@matte902@cloud"
+repository "MathVRGameNew@matte902@cloud"
   path "/"
     br "/main"
     co "/main"
