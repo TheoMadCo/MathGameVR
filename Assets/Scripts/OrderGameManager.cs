@@ -3,10 +3,12 @@ using UnityEngine;
 using TMPro;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-using UnityEngine.XR.Interaction.Toolkit;  // For handling UI components like Canvas, Text, and Button
+using UnityEngine.XR.Interaction.Toolkit;
 
 public class OrderGameManager : MonoBehaviour
 {
+    public string difficulty = "easy"; //difficulty selection only for test purposes
+
     public GameObject blockPrefab;  // Prefab for numbered block
     public GameObject platePrefab;  // Prefab for the plate with XR Socket Interactor
     public Transform[] blockSpawnPoints;  // Array of predefined spawn points for blocks
@@ -27,9 +29,13 @@ public class OrderGameManager : MonoBehaviour
     private int numberOfPlates;  // Number of plates to generate, based on difficulty
     private bool isAscendingOrder;  // True if ascending order, false if descending
 
+    // Audio clips for correct and incorrect order
+    public AudioClip correctOrderClip;
+    public AudioClip incorrectOrderClip;
+
     void Start()
     {
-        SetDifficulty("medium");  // Set default difficulty (you can change this dynamically)
+        SetDifficulty(difficulty);  // Set default difficulty (you can change this dynamically)
         GeneratePlatesAndBlocks();  // Call this to spawn the plates and blocks
 
         // Set the button to be unclickable at the start and show as grey
@@ -188,6 +194,7 @@ public class OrderGameManager : MonoBehaviour
         bool correctOrder = isAscendingOrder ? IsSortedAscending(blockNumbers) : IsSortedDescending(blockNumbers);
 
         // Display result based on whether the order is correct
+        //if the result is correct, put "Well Done!" in the result text, otherwise put "Try Again!". Basing on the result, a different sound will be played.
         if (correctOrder)
         {
             resultText.text = "Well Done!";
@@ -195,7 +202,12 @@ public class OrderGameManager : MonoBehaviour
         else
         {
             resultText.text = "Try Again!";
+            
         }
+
+        // Play the corresponding audio clip based on the result
+        AudioSource audioSource = GetComponent<AudioSource>();
+        audioSource.PlayOneShot(correctOrder ? correctOrderClip : incorrectOrderClip, 1);
 
         //Remove the "panic" button
         panicButton.gameObject.SetActive(false);
