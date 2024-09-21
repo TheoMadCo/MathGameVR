@@ -25,10 +25,18 @@ public class GameManager : MonoBehaviour
     private int minRange = 1;
     private int maxRange = 11;
 
+    private string selectedDifficulty;
+    private string selectedOperation;
+
     void Start()
     {
+        // Fetch the selected difficulty and operation from PlayerPrefs
+        selectedDifficulty = PlayerPrefs.GetString("Difficulty", "Easy"); // Default to "Easy" if not set
+        selectedOperation = PlayerPrefs.GetString("Operation", "Addition"); // Default to "Addition" if not set
+
         SetDifficultyRanges();
-        displayDifficulty();
+        DisplayDifficulty();
+
         score = 0;
         roundCount = 0;
         resultPanel.SetActive(false);
@@ -37,7 +45,7 @@ public class GameManager : MonoBehaviour
 
     void SetDifficultyRanges()
     {
-        switch (SelectionManager.selectedDifficulty)
+        switch (selectedDifficulty)
         {
             case "Easy":
                 minRange = 1;
@@ -63,10 +71,9 @@ public class GameManager : MonoBehaviour
         }
 
         int a, b;
-        string operation = SelectionManager.selectedOperation;
         List<int> answers = new List<int>();
 
-        switch (operation)
+        switch (selectedOperation)
         {
             case "Addition":
                 a = Random.Range(minRange, maxRange);
@@ -183,17 +190,18 @@ public class GameManager : MonoBehaviour
         quitGameButton.onClick.AddListener(BackToSelection);
     }
 
-    void displayDifficulty()
-     {
-        DifficultyText.text += SelectionManager.selectedDifficulty;
+    void DisplayDifficulty()
+    {
+        DifficultyText.text = "Difficulty: " + selectedDifficulty;
     }
+
     void RetryGame()
     {
-        SceneManager.LoadScene("GameScene");
+        SceneManager.LoadScene("FractionGameScene");
     }
 
     void BackToSelection()
     {
-        SceneManager.LoadScene("StartupScene");
+        SceneManager.LoadScene("StarterSceneClassroom");
     }
 }

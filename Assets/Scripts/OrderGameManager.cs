@@ -7,7 +7,7 @@ using UnityEngine.XR.Interaction.Toolkit;
 
 public class OrderGameManager : MonoBehaviour
 {
-    public string difficulty = "easy"; //difficulty selection only for test purposes
+    private string selectedDifficulty; // Difficulty fetched from PlayerPrefs
 
     public GameObject blockPrefab;  // Prefab for numbered block
     public GameObject platePrefab;  // Prefab for the plate with XR Socket Interactor
@@ -35,7 +35,10 @@ public class OrderGameManager : MonoBehaviour
 
     void Start()
     {
-        SetDifficulty(difficulty);  // Set default difficulty (you can change this dynamically)
+        // Fetch the selected difficulty from PlayerPrefs
+        selectedDifficulty = PlayerPrefs.GetString("Difficulty", "Easy"); // Default to "Easy" if not set
+
+        SetDifficulty(selectedDifficulty);  // Set difficulty based on the selection
         GeneratePlatesAndBlocks();  // Call this to spawn the plates and blocks
 
         // Set the button to be unclickable at the start and show as grey
@@ -79,7 +82,6 @@ public class OrderGameManager : MonoBehaviour
         CheckIfAllBlocksPlaced();
     }
 
-
     // Method to generate plates and blocks based on difficulty
     public void GeneratePlatesAndBlocks()
     {
@@ -117,7 +119,6 @@ public class OrderGameManager : MonoBehaviour
         // Disable the "Check Solution" button until all blocks are placed
         SetButtonInteractable(false);
     }
-
 
     // Method to generate blocks (same as before)
     public void GenerateBlocks()
@@ -162,7 +163,6 @@ public class OrderGameManager : MonoBehaviour
         SetButtonInteractable(allBlocksPlaced);
     }
 
-
     // Called when the check button is pressed
     public void OnCheckSolutionPressed()
     {
@@ -194,7 +194,6 @@ public class OrderGameManager : MonoBehaviour
         bool correctOrder = isAscendingOrder ? IsSortedAscending(blockNumbers) : IsSortedDescending(blockNumbers);
 
         // Display result based on whether the order is correct
-        //if the result is correct, put "Well Done!" in the result text, otherwise put "Try Again!". Basing on the result, a different sound will be played.
         if (correctOrder)
         {
             resultText.text = "Well Done!";
@@ -202,14 +201,13 @@ public class OrderGameManager : MonoBehaviour
         else
         {
             resultText.text = "Try Again!";
-            
         }
 
         // Play the corresponding audio clip based on the result
         AudioSource audioSource = GetComponent<AudioSource>();
         audioSource.PlayOneShot(correctOrder ? correctOrderClip : incorrectOrderClip, 1);
 
-        //Remove the "panic" button
+        // Remove the "panic" button
         panicButton.gameObject.SetActive(false);
 
         // Update the button text to "Retry"
@@ -219,7 +217,6 @@ public class OrderGameManager : MonoBehaviour
         checkSolutionButton.onClick.RemoveAllListeners();  // Clear any previous listeners
         checkSolutionButton.onClick.AddListener(RestartGame);  // Assign the restart function to the button
     }
-
 
     // Helper method to check if the block numbers are in ascending order
     private bool IsSortedAscending(List<int> numbers)
@@ -261,5 +258,4 @@ public class OrderGameManager : MonoBehaviour
         // Reload the current scene to reset everything
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
-
 }
