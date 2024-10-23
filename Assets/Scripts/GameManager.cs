@@ -14,8 +14,8 @@ public class GameManager : MonoBehaviour
     public GameObject gamePanel;
     public GameObject resultPanel;
     public TextMeshProUGUI resultText;
-    public Button retryButton;
-    public Button quitGameButton;
+    // public Button retryButton;
+    // public Button quitGameButton;
 
     private int correctAnswer;
     private float score;
@@ -186,8 +186,8 @@ public class GameManager : MonoBehaviour
         resultPanel.SetActive(true);
         string motivationalText = GetScoreText();
         resultText.text = $"{score} out of {maxRounds}\n" + motivationalText;
-        retryButton.onClick.AddListener(RetryGame);
-        quitGameButton.onClick.AddListener(BackToSelection);
+        // retryButton.onClick.AddListener(RetryGame);
+        // quitGameButton.onClick.AddListener(BackToSelection);
     }
 
     void DisplayDifficulty()
@@ -195,6 +195,7 @@ public class GameManager : MonoBehaviour
         DifficultyText.text = "Difficulty: " + selectedDifficulty;
     }
 
+    /*
     void RetryGame()
     {
         SceneManager.LoadScene("FractionGameScene");
@@ -204,4 +205,5 @@ public class GameManager : MonoBehaviour
     {
         SceneManager.LoadScene("StarterSceneClassroom");
     }
+    */
 }

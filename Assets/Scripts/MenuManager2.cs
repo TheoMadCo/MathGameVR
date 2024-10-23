@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -14,6 +15,8 @@ public class MenuManager2 : MonoBehaviour
     private string selectedOperation; // Stores the selected fraction operation (Addition, Subtraction, etc.)
     private string selectedDifficulty; // Stores the selected difficulty (Easy, Medium, Hard)
 
+    private Stack<GameObject> navigationStack = new Stack<GameObject>(); // Stack to manage the back button navigation
+
     void Start()
     {
         // Start by showing the Welcome screen
@@ -23,15 +26,13 @@ public class MenuManager2 : MonoBehaviour
     // Show the Welcome Screen
     public void ShowWelcomeScreen()
     {
-        ResetAllBackgrounds();
-        welcomeBackground.SetActive(true);
+        SetActiveScreen(welcomeBackground);
     }
 
     // Function when the "Play" button is pressed from Welcome Screen
     public void OnPlayPressed()
     {
-        ResetAllBackgrounds();
-        gameSelectionBackground.SetActive(true);
+        SetActiveScreen(gameSelectionBackground);
     }
 
     // Function for selecting FractionGame or OrderingGame
@@ -42,14 +43,12 @@ public class MenuManager2 : MonoBehaviour
         // If the player selects FractionGame, show the SelectOperation screen
         if (selectedGame == "FractionGame")
         {
-            ResetAllBackgrounds();
-            selectOperationBackground.SetActive(true); // Show operation selection for fraction game
+            SetActiveScreen(selectOperationBackground); // Show operation selection for fraction game
         }
         else if (selectedGame == "OrderingGame")
         {
             // If the player selects OrderingGame, go directly to Difficulty Selection
-            ResetAllBackgrounds();
-            difficultySelectionBackground.SetActive(true);
+            SetActiveScreen(difficultySelectionBackground);
         }
     }
 
@@ -57,16 +56,14 @@ public class MenuManager2 : MonoBehaviour
     public void OnSelectOperation(string operation)
     {
         selectedOperation = operation;
-        ResetAllBackgrounds();
-        difficultySelectionBackground.SetActive(true); // Move to difficulty selection after choosing operation
+        SetActiveScreen(difficultySelectionBackground); // Move to difficulty selection after choosing operation
     }
 
     // Function for selecting a difficulty (common for both games)
     public void OnSelectDifficulty(string difficulty)
     {
         selectedDifficulty = difficulty;
-        ResetAllBackgrounds();
-        confirmPlayBackground.SetActive(true); // Move to confirmation screen after selecting difficulty
+        SetActiveScreen(confirmPlayBackground); // Move to confirmation screen after selecting difficulty
     }
 
     // Function to confirm and start the game
@@ -94,12 +91,31 @@ public class MenuManager2 : MonoBehaviour
         }
     }
 
-    // Function for handling "Back" button in ConfirmPlay screen
+    // Function to handle the back button using the navigation stack
     public void OnBackPressed()
     {
-        // Go back to Difficulty Selection
+        if (navigationStack.Count > 1) // Ensure there is a previous screen to go back to
+        {
+            navigationStack.Pop(); // Remove the current screen
+            GameObject previousScreen = navigationStack.Peek(); // Get the previous screen
+            SetActiveScreen(previousScreen, false); // Display the previous screen without pushing it back to the stack
+        }
+    }
+
+    // Utility to set the active screen and push the current screen onto the navigation stack
+    private void SetActiveScreen(GameObject newScreen, bool pushToStack = true)
+    {
+        // Disable all backgrounds
         ResetAllBackgrounds();
-        difficultySelectionBackground.SetActive(true);
+
+        // Enable the new screen
+        newScreen.SetActive(true);
+
+        // Push the current screen to the stack if required
+        if (pushToStack)
+        {
+            navigationStack.Push(newScreen);
+        }
     }
 
     // Quit the game from the Welcome screen
