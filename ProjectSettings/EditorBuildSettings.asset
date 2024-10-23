@@ -23,6 +23,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/FractionGameScene.unity
     guid: a39e05cfef05c2942bf0473114622f35
+  - enabled: 1
+    path: Assets/Scenes/CompleteOperationGame.unity
+    guid: cf19c8518fce65c419a36285c577d44d
   m_configObjects:
     Unity.XR.Oculus.Settings: {fileID: 11400000, guid: ed72be55522c8448bae8b0d66fa21adf,
       type: 2}
