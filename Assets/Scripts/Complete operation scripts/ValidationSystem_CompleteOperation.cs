@@ -10,9 +10,38 @@ public class ValidationSystem_CompleteOperation : MonoBehaviour
     public bool ValidateResult()
     {
         List<int?> placedNumbers = slotManager.GetPlacedCardNumbers();  // Get the placed card numbers
+        List<int?> expectedNumbers = GetExpectedNumbers();              // Get the expected numbers for the current operation
+
+        Debug.Log("Expected Numbers: " + string.Join(", ", expectedNumbers));  // Log expected numbers
+        Debug.Log("Placed Numbers: " + string.Join(", ", placedNumbers));      // Log placed numbers
+
+        // Compare each slot pair (tens and ones) to validate the result
+        for (int i = 0; i < expectedNumbers.Count; i++)
+        {
+            int? expectedDigit = expectedNumbers[i];
+            int? placedDigit = placedNumbers[i];
+
+            // Log each comparison for debugging
+            Debug.Log($"Comparing slot {i}: Expected = {expectedDigit}, Placed = {placedDigit}");
+
+            // If the expected number and placed number don't match, validation fails
+            if (expectedDigit != placedDigit)
+            {
+                Debug.Log("Mismatch found. Player loses.");
+                return false;  // The player loses if any digit is incorrect
+            }
+        }
+
+        Debug.Log("All numbers match. Player wins!");
+        return true;  // All digits are correct
+    }
+
+    // Get expected digits for the current operation type
+    private List<int?> GetExpectedNumbers()
+    {
         List<int?> expectedNumbers = new List<int?>();
 
-        // Add the digits of the left operand
+        // Left Operand
         if (operationGenerator.LeftOperand >= 10)
         {
             expectedNumbers.Add(operationGenerator.LeftOperand / 10);  // Tens place
@@ -20,11 +49,12 @@ public class ValidationSystem_CompleteOperation : MonoBehaviour
         }
         else
         {
-            expectedNumbers.Add(null);  // Single digit, leave the tens place empty
-            expectedNumbers.Add(operationGenerator.LeftOperand);  // Ones place filled
+            expectedNumbers.Add(null);  // Leave tens place empty for single-digit
+            expectedNumbers.Add(operationGenerator.LeftOperand);  // Ones place
         }
+        Debug.Log($"Left Operand ({operationGenerator.LeftOperand}): {string.Join(", ", expectedNumbers)}");
 
-        // Add the digits of the right operand
+        // Right Operand
         if (operationGenerator.RightOperand >= 10)
         {
             expectedNumbers.Add(operationGenerator.RightOperand / 10);  // Tens place
@@ -32,55 +62,46 @@ public class ValidationSystem_CompleteOperation : MonoBehaviour
         }
         else
         {
-            expectedNumbers.Add(null);  // Single digit, leave the tens place empty
-            expectedNumbers.Add(operationGenerator.RightOperand);  // Ones place filled
+            expectedNumbers.Add(null);  // Leave tens place empty for single-digit
+            expectedNumbers.Add(operationGenerator.RightOperand);  // Ones place
+        }
+        Debug.Log($"Right Operand ({operationGenerator.RightOperand}): {string.Join(", ", expectedNumbers)}");
+
+        // Expected Result Calculation
+        int expectedResult = 0;
+        switch (operationGenerator.operationType)
+        {
+            case OperationType.Addition:
+                expectedResult = operationGenerator.LeftOperand + operationGenerator.RightOperand;
+                break;
+            case OperationType.Subtraction:
+                expectedResult = operationGenerator.LeftOperand - operationGenerator.RightOperand;
+                break;
+            case OperationType.Multiplication:
+                expectedResult = operationGenerator.LeftOperand * operationGenerator.RightOperand;
+                break;
         }
 
-        // Add the digits of the result
-        if (operationGenerator.Result >= 10)
+        Debug.Log($"Computed Result ({operationGenerator.LeftOperand} {operationGenerator.operationType} {operationGenerator.RightOperand}): {expectedResult}");
+
+        // Result tens and ones places
+        if (expectedResult >= 10)
         {
-            expectedNumbers.Add(operationGenerator.Result / 10);  // Tens place
-            expectedNumbers.Add(operationGenerator.Result % 10);  // Ones place
+            expectedNumbers.Add(expectedResult / 10);  // Tens place
+            expectedNumbers.Add(expectedResult % 10);  // Ones place
         }
         else
         {
-            expectedNumbers.Add(null);  // Single digit, leave the tens place empty
-            expectedNumbers.Add(operationGenerator.Result);  // Ones place filled
+            expectedNumbers.Add(null);  // Leave tens place empty for single-digit result
+            expectedNumbers.Add(expectedResult);  // Ones place
         }
 
-        // Compare the placed numbers to the expected numbers
-        for (int i = 0; i < expectedNumbers.Count; i += 2)  // Iterate over pairs (tens and ones)
-        {
-            int? expectedTens = expectedNumbers[i];
-            int? expectedOnes = expectedNumbers[i + 1];
-            int? placedTens = placedNumbers[i];
-            int? placedOnes = placedNumbers[i + 1];
+        // Final expected numbers log for confirmation
+        Debug.Log("Expected Numbers (Final): " + string.Join(", ", expectedNumbers));
 
-            // Handle the case for two-digit numbers (both tens and ones must be filled)
-            if (expectedTens != null && expectedOnes != null)
-            {
-                // If either the tens or ones place is missing for a two-digit number, fail
-                if (placedTens == null || placedOnes == null || placedTens != expectedTens || placedOnes != expectedOnes)
-                {
-                    return false;
-                }
-            }
-
-            // Handle the case for single-digit numbers (either tens or ones can be filled, but not both empty)
-            else if (expectedTens == null && expectedOnes != null)  // Single-digit case
-            {
-                if ((placedTens != null && placedOnes == null && placedTens == expectedOnes) ||  // Tens filled, ones empty
-                    (placedTens == null && placedOnes != null && placedOnes == expectedOnes))  // Ones filled, tens empty
-                {
-                    continue;  // Valid case for single-digit numbers
-                }
-                else
-                {
-                    return false;  // Invalid if neither match or both are empty
-                }
-            }
-        }
-
-        return true;  // All numbers are correct
+        return expectedNumbers;
     }
+
+
+
 }
