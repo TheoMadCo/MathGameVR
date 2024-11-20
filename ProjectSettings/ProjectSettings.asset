@@ -912,11 +912,11 @@ PlayerSettings:
   apiCompatibilityLevel: 6
   activeInputHandler: 1
   windowsGamepadBackendHint: 0
-  cloudProjectId: 
+  cloudProjectId: f90fd242-aaae-4084-b828-369b7e9f0592
   framebufferDepthMemorylessMode: 0
   qualitySettingsNames: []
-  projectName: 
-  organizationId: 
+  projectName: NewMathVRGame
+  organizationId: matte902
   cloudEnabled: 0
   legacyClampBlendShapeWeights: 0
   hmiLoadingImage: {fileID: 0}
