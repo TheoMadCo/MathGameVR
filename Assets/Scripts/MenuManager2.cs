@@ -36,23 +36,27 @@ public class MenuManager2 : MonoBehaviour
     }
 
     // Function for selecting FractionGame or OrderingGame
+    // Function for selecting FractionGame, OrderingGame, or CompleteOperation
     public void OnSelectGame(string game)
     {
         selectedGame = game;
 
-        // If the player selects FractionGame, show the SelectOperation screen
         if (selectedGame == "FractionGame")
         {
-            SetActiveScreen(selectOperationBackground); // Show operation selection for fraction game
+            SetActiveScreen(selectOperationBackground); // Show operation selection for FractionGame
         }
         else if (selectedGame == "OrderingGame")
         {
-            // If the player selects OrderingGame, go directly to Difficulty Selection
-            SetActiveScreen(difficultySelectionBackground);
+            SetActiveScreen(difficultySelectionBackground); // Directly go to difficulty selection
+        }
+        else if (selectedGame == "CompleteOperation")
+        {
+            SetActiveScreen(selectOperationBackground); // Show operation selection for CompleteOperation
         }
     }
 
-    // Function for selecting a fraction operation (only applicable for FractionGame)
+
+    // Function for selecting a fraction operation or CompleteOperation
     public void OnSelectOperation(string operation)
     {
         selectedOperation = operation;
@@ -76,13 +80,17 @@ public class MenuManager2 : MonoBehaviour
 
             if (selectedGame == "FractionGame")
             {
-                // If FractionGame, also pass the selected operation
-                PlayerPrefs.SetString("Operation", selectedOperation);
+                PlayerPrefs.SetString("Operation", selectedOperation); // Pass the operation
                 SceneManager.LoadScene("FractionGameScene");
             }
             else if (selectedGame == "OrderingGame")
             {
                 SceneManager.LoadScene("OrderingGameScene");
+            }
+            else if (selectedGame == "CompleteOperation")
+            {
+                PlayerPrefs.SetString("Operation", selectedOperation); // Pass the operation
+                SceneManager.LoadScene("CompleteOperationGame");
             }
         }
         else
@@ -90,6 +98,7 @@ public class MenuManager2 : MonoBehaviour
             Debug.LogError("Game or Difficulty not selected.");
         }
     }
+
 
     // Function to handle the back button using the navigation stack
     public void OnBackPressed()

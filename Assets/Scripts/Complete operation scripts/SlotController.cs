@@ -25,4 +25,16 @@ public class SlotController : MonoBehaviour
             renderer.material = originalMaterial;  // Reset to original
         }
     }
+
+    public void SetSlotActive(bool isActive)
+    {
+        gameObject.SetActive(isActive);  // Enable or disable the slot GameObject
+    }
+
+    public bool IsActive()
+    {
+        return gameObject.activeSelf;  // Returns true if the slot GameObject is active
+    }
+
+
 }

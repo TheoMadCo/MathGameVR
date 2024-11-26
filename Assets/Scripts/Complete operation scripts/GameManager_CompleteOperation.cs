@@ -2,6 +2,8 @@ using UnityEngine;
 using TMPro;
 using System.Diagnostics;
 
+public enum Difficulty { Easy, Medium, Hard }
+
 public class GameManager_CompleteOperation : MonoBehaviour
 {
     public OperationGenerator operationGenerator;
@@ -10,14 +12,40 @@ public class GameManager_CompleteOperation : MonoBehaviour
     public SlotManager_CompleteOperation slotManager;
 
     public int totalTasks = 5;  // Total number of tasks to complete (set in Inspector)
+    public Difficulty selectedDifficulty = Difficulty.Easy;  // Set difficulty in Inspector
     private int completedTasks = 0;  // Number of tasks completed
     private Stopwatch stopwatch;  // Timer to track time taken
     public string playerName = "Player";  // Set in Inspector for now
 
-    public TextMeshPro displayText;  // Single TextMeshPro for task counter and final score
+    // Optional overrides for testing
+    public OperationType? operationTypeOverride;  // Allows testing specific operations
+    public Difficulty? difficultyOverride;        // Allows testing specific difficulties
+
 
     void Start()
     {
+        // Fetch and log operation type
+        OperationType operationType = operationTypeOverride.HasValue
+            ? operationTypeOverride.Value
+            : (OperationType)System.Enum.Parse(typeof(OperationType), PlayerPrefs.GetString("Operation", "Addition"));
+
+        UnityEngine.Debug.Log($"Starting GameManager. OperationType: {operationType}");
+
+        // Fetch and log difficulty
+        Difficulty difficulty = difficultyOverride.HasValue
+            ? difficultyOverride.Value
+            : (Difficulty)System.Enum.Parse(typeof(Difficulty), PlayerPrefs.GetString("Difficulty", "Easy"));
+
+        UnityEngine.Debug.Log($"Starting GameManager. Difficulty: {difficulty}");
+
+        // Pass the selected difficulty and operation to other components
+        operationGenerator.SetOperationType(operationType);
+        operationGenerator.SetDifficulty(difficulty);
+        slotManager.ConfigureSlotsForDifficulty(difficulty);
+
+        // Update UI based on difficulty
+        uiManager.UpdateLinesForDifficulty(difficulty);
+
         // Initialize variables
         completedTasks = 0;
         stopwatch = new Stopwatch();
@@ -26,14 +54,17 @@ public class GameManager_CompleteOperation : MonoBehaviour
         // Generate and display the first operation
         GenerateNewOperation();
 
+        UnityEngine.Debug.Log("First operation generated successfully.");
+
         // Update the UI to show the initial task counter
-        UpdateDisplayText();
+        uiManager.UpdateDisplayText(completedTasks, totalTasks);
     }
+
 
     private void GenerateNewOperation()
     {
         // Clear all cards from the slots before generating a new operation
-        slotManager.ClearAllSlots(); 
+        slotManager.ClearAllSlots();
 
         // Generate and display a new operation
         operationGenerator.GenerateNewOperation();
@@ -44,12 +75,12 @@ public class GameManager_CompleteOperation : MonoBehaviour
     {
         // Validate the result
         bool isCorrect = validationSystem.ValidateResult();
-        uiManager.DisplayResult(isCorrect);  // Show "You Win" or "You Lose"
+        uiManager.DisplayResult(isCorrect);  // Show winning or losing message
 
         if (isCorrect)
         {
             completedTasks++;  // Increment tasks on correct answer
-            UpdateDisplayText();
+            uiManager.UpdateDisplayText(completedTasks, totalTasks);
 
             if (completedTasks >= totalTasks)
             {
@@ -62,23 +93,9 @@ public class GameManager_CompleteOperation : MonoBehaviour
         }
     }
 
-    private void UpdateDisplayText()
-    {
-        // Update the display text dynamically
-        if (completedTasks < totalTasks)
-        {
-            displayText.text = $"Hai completato {completedTasks} operazioni su {totalTasks}.\n\n Ti rimangono {totalTasks - completedTasks} operazioni da completare!";
-        }
-    }
 
     private void EndGame()
     {
-        if (displayText == null)
-        {
-            UnityEngine.Debug.LogError("DisplayText is not assigned in the Inspector.");
-            return;
-        }
-
         if (Leaderboard_CompleteOperation.Instance == null)
         {
             UnityEngine.Debug.LogError("Leaderboard_CompleteOperation.Instance is null. Ensure the Leaderboard_CompleteOperation GameObject is in the scene.");
@@ -95,7 +112,9 @@ public class GameManager_CompleteOperation : MonoBehaviour
         Leaderboard_CompleteOperation.Instance.ExportToCSV();
 
         // Display the final score
-        displayText.text = $"Hai completato {completedTasks} operazioni in {completionTime:F2} secondi!"; // Time just for testing purposes
+        uiManager.DisplayEndGameMessage();
+        // Use UIManager to display the final score
+        uiManager.DisplayFinalScore(completedTasks, completionTime);
         UnityEngine.Debug.Log("Game ended successfully, and final text was updated.");
     }
 

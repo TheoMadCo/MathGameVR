@@ -30,11 +30,11 @@ public class Leaderboard_CompleteOperation : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
-            DontDestroyOnLoad(gameObject);  // Keep this object across scenes
+            // Remove: DontDestroyOnLoad(gameObject);
         }
         else
         {
-            Destroy(gameObject);  // Prevent duplicates
+            Destroy(gameObject);
         }
 
         leaderboardFilePath = Path.Combine(Application.persistentDataPath, "leaderboard_complete_operation.json");

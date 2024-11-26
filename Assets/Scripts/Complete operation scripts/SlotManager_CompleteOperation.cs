@@ -22,23 +22,36 @@ public class SlotManager_CompleteOperation : MonoBehaviour
     // Get the numbers placed in the slots, considering empty slots as nulls
     public List<int?> GetPlacedCardNumbers()
     {
-        List<int?> cardNumbers = new List<int?>();
+        List<int?> placedNumbers = new List<int?>();
 
-        foreach (XRSocketInteractor slot in cardSlots)
+        for (int i = 0; i < cardSlots.Count; i++)
         {
-            if (slot.hasSelection)
+            if (slotControllers[i].IsActive())  // Only check active slots
             {
-                // Get the card number from the card placed in the slot
-                var card = slot.GetOldestInteractableSelected().transform.GetComponent<CardController>();
-                cardNumbers.Add(card.GetNumber());  // Add the number to the list
+                if (cardSlots[i].hasSelection)
+                {
+                    // Get the card number from the card placed in the slot
+                    var card = cardSlots[i].GetOldestInteractableSelected().transform.GetComponent<CardController>();
+                    placedNumbers.Add(card.GetNumber());
+                }
+                else
+                {
+                    placedNumbers.Add(null);  // Treat empty active slots as null
+                }
             }
             else
             {
-                cardNumbers.Add(null);  // If no card is placed, treat it as null (empty)
+                placedNumbers.Add(null);  // Disabled slots are treated as null
             }
         }
-        return cardNumbers;
+
+        Debug.Log($"Placed Numbers: {string.Join(", ", placedNumbers)}");
+        return placedNumbers;
     }
+
+
+
+    // Clears all cards from the slots
     public void ClearAllSlots()
     {
         foreach (XRSocketInteractor slot in cardSlots)
@@ -51,5 +64,26 @@ public class SlotManager_CompleteOperation : MonoBehaviour
             }
         }
     }
+
+    // Configures slots based on difficulty, enabling only the necessary ones
+    public void ConfigureSlotsForDifficulty(Difficulty difficulty)
+    {
+        // Number of active columns (rightmost columns are active)
+        int activeColumns = difficulty == Difficulty.Hard ? 3 : 2;  // 3 for Hard, 2 for Easy/Medium
+
+        // Disable sockets in the leftmost columns
+        for (int i = 0; i < cardSlots.Count; i++)
+        {
+            // Determine column index (0 = leftmost, 2 = rightmost in a 3-column grid)
+            int column = i % 3;
+
+            // Enable or disable slot based on the active columns
+            bool isActive = column >= (3 - activeColumns);  // Rightmost columns are active
+            slotControllers[i].SetSlotActive(isActive);
+        }
+
+        Debug.Log($"Configured slots for {difficulty} difficulty. Active columns: {activeColumns}");
+    }
+
 
 }
