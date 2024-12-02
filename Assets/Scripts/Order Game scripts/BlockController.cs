@@ -1,5 +1,5 @@
 using UnityEngine;
-using TMPro; 
+using TMPro;
 
 public class BlockController : MonoBehaviour
 {
@@ -17,5 +17,15 @@ public class BlockController : MonoBehaviour
     public int GetBlockNumber()
     {
         return blockNumber;
+    }
+
+    // Optional: Method to change block material if needed
+    public void ChangeMaterial(Material newMaterial)
+    {
+        Renderer blockRenderer = GetComponent<Renderer>();
+        if (blockRenderer != null)
+        {
+            blockRenderer.material = newMaterial;
+        }
     }
 }
