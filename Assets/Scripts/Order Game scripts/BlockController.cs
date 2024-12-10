@@ -22,7 +22,7 @@ public class BlockController : MonoBehaviour
     // Optional: Method to change block material if needed
     public void ChangeMaterial(Material newMaterial)
     {
-        Renderer blockRenderer = GetComponent<Renderer>();
+        Renderer blockRenderer = GetComponent<Renderer>(); 
         if (blockRenderer != null)
         {
             blockRenderer.material = newMaterial;

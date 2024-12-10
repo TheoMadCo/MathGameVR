@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 1825057815314070002}
   - component: {fileID: 3624612383729903669}
   - component: {fileID: 5735824812181764062}
+  - component: {fileID: 2592124177478968297}
   m_Layer: 0
   m_Name: NumberedCube
   m_TagString: Block
@@ -302,6 +303,20 @@ MonoBehaviour:
   m_StartingSingleGrabTransformers: []
   m_StartingMultipleGrabTransformers: []
   m_AddDefaultGrabTransformers: 1
+--- !u!114 &2592124177478968297
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6401836582136617946}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1486c411ea6cd3443997f647410cfd10, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  numberText: {fileID: 8326339287665386867}
+  blockNumber: 0
 --- !u!1 &7721007690162756246
 GameObject:
   m_ObjectHideFlags: 0

@@ -1,4 +1,4 @@
 repository "MathVRGameNew@matte902@cloud"
   path "/"
-    smartbranch "/main" changeset "66"                          
-     
+    br "/main"
+    co "/main"
