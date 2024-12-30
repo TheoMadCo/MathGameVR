@@ -1,11 +1,14 @@
+using UnityEditor;
 using UnityEngine;
 
 public class SlotController : MonoBehaviour
 {
+    [Header("Slot Materials")]
     private Material originalMaterial;
     public Material incorrectMaterial;  // Assign a red material in the inspector
+    public Material correctMaterial;    // Assign a green material in the inspector
 
-    private Renderer renderer;
+    private new Renderer renderer;
 
     private void Awake()
     {
@@ -13,12 +16,25 @@ public class SlotController : MonoBehaviour
         originalMaterial = renderer.material;  // Store the original material
     }
 
-    // Set the slot's appearance to indicate incorrect or correct
+    // Set the slot's appearance to indicate incorrect 
     public void SetIncorrect(bool isIncorrect)
     {
         if (isIncorrect)
         {
             renderer.material = incorrectMaterial;  // Set to red material
+        }
+        else
+        {
+            renderer.material = originalMaterial;  // Reset to original
+        }
+    }
+
+    // Set the slot's appearance to indicate correct 
+    public void SetCorrect(bool isCorrect)
+    {
+        if (isCorrect)
+        {
+            renderer.material = correctMaterial;  // Set to green material
         }
         else
         {

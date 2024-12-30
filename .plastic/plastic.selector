@@ -1,4 +1,3 @@
-repository "MathVRGameNew@matte902@cloud"
+rep "MathVRGameNew@matte902@cloud"
   path "/"
-    br "/main"
-    co "/main"
+    smartbranch "/main" changeset "99"  

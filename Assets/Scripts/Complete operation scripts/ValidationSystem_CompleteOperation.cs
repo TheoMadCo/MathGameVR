@@ -51,6 +51,7 @@ public class ValidationSystem_CompleteOperation : MonoBehaviour
 {
     public OperationGenerator operationGenerator;
     public SlotManager_CompleteOperation slotManager;
+    public List<int> correctSlotIndices = new List<int>();  // Track correct slot indices
 
     // Validates the placed card numbers against the expected numbers
     public bool ValidateResult()
@@ -62,8 +63,9 @@ public class ValidationSystem_CompleteOperation : MonoBehaviour
         Debug.Log($"Expected Numbers: {string.Join(", ", expectedNumbers)}");
 
         bool isAllCorrect = true;  // Track if all numbers are correct
+        correctSlotIndices.Clear();  // Clear previous correct slot indices
 
-        // Compare each slot, marking incorrect ones
+        // Compare each slot, marking incorrect or correct
         for (int i = 0; i < expectedNumbers.Count; i++)
         {
             int? expectedDigit = expectedNumbers[i];
@@ -82,7 +84,12 @@ public class ValidationSystem_CompleteOperation : MonoBehaviour
             else
             {
                 Debug.Log($"Slot {i} is correct. Value: {expectedDigit}");
-                slotManager.ClearHighlightSlot(i);  // Clear highlight for correct slot
+
+                if (slotManager.slotControllers[i].IsActive())  // Only track active slots
+                {
+                    slotManager.HighlightCorrectSlot(i);  // Highlight correct slot in green
+                    correctSlotIndices.Add(i);  // Add index of correct slot
+                }
             }
         }
 
@@ -150,7 +157,4 @@ public class ValidationSystem_CompleteOperation : MonoBehaviour
         Debug.Log($"Expected Numbers: {string.Join(", ", expectedNumbers)}");
         return expectedNumbers;
     }
-
-
-
 }

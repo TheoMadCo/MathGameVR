@@ -4,8 +4,10 @@ using System.Collections.Generic;
 
 public class CardStackManager : MonoBehaviour
 {
+    [Header("Card prefabs")]
     public GameObject[] numberCardPrefabs;  // Array to hold card prefabs (0-9)
 
+    [Header("Card Piles")]
     // Array to hold stacks manually assigned in the Inspector
     public XRBaseInteractable[] cardStacks;  // Array of stacks (assigned in Inspector)
 

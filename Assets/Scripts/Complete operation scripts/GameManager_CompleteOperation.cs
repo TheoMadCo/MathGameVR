@@ -1,26 +1,28 @@
 using UnityEngine;
-using TMPro;
 using System.Diagnostics;
 
 public enum Difficulty { Easy, Medium, Hard }
 
 public class GameManager_CompleteOperation : MonoBehaviour
 {
+    [Header("Scripts")]
     public OperationGenerator operationGenerator;
     public UIManager_CompleteOperation uiManager;
     public ValidationSystem_CompleteOperation validationSystem;
     public SlotManager_CompleteOperation slotManager;
 
+    [Header("Game Parameters")]
     public int totalTasks = 5;  // Total number of tasks to complete (set in Inspector)
     public Difficulty selectedDifficulty = Difficulty.Easy;  // Set difficulty in Inspector
     private int completedTasks = 0;  // Number of tasks completed
     private Stopwatch stopwatch;  // Timer to track time taken
     public string playerName = "Player";  // Set in Inspector for now
 
-    // Optional overrides for testing
+    [Header("Optional overrides for testing")]
     public OperationType? operationTypeOverride;  // Allows testing specific operations
     public Difficulty? difficultyOverride;        // Allows testing specific difficulties
 
+    private bool operationSolvedCorrectly = false;  // Flag to track if current operation was solved correctly
 
     void Start()
     {
@@ -60,7 +62,6 @@ public class GameManager_CompleteOperation : MonoBehaviour
         uiManager.UpdateDisplayText(completedTasks, totalTasks);
     }
 
-
     private void GenerateNewOperation()
     {
         // Clear all cards from the slots before generating a new operation
@@ -69,18 +70,62 @@ public class GameManager_CompleteOperation : MonoBehaviour
         // Generate and display a new operation
         operationGenerator.GenerateNewOperation();
         uiManager.DisplayOperation(operationGenerator.OperationString);
+
+        // Clear any previous highlights
+        slotManager.ClearAllHighlights();
     }
 
     public void OnCheckResultButtonPressed()
     {
         // Validate the result
         bool isCorrect = validationSystem.ValidateResult();
-        uiManager.DisplayResult(isCorrect);  // Show winning or losing message
 
         if (isCorrect)
         {
-            completedTasks++;  // Increment tasks on correct answer
+            // Set flag for correct operation
+            operationSolvedCorrectly = true;
+
+            // Highlight correct slots in green
+            foreach (int correctSlotIndex in validationSystem.correctSlotIndices)
+            {
+                slotManager.HighlightCorrectSlot(correctSlotIndex);
+            }
+
+            // Display result with continue button
+            uiManager.DisplayResult(isCorrect);
+        }
+        else
+        {
+            // For incorrect result, just show the result
+            uiManager.DisplayResult(isCorrect);
+        }
+    }
+
+    private void OnEnable()
+    {
+        // Subscribe to the continue button event from UIManager
+        uiManager.OnContinueButtonPressed += HandleContinueButtonPressed;
+    }
+
+    private void OnDisable()
+    {
+        // Unsubscribe to prevent memory leaks
+        uiManager.OnContinueButtonPressed -= HandleContinueButtonPressed;
+    }
+
+    private void HandleContinueButtonPressed()
+    {
+        if (operationSolvedCorrectly)
+        {
+            // Reset the flag
+            operationSolvedCorrectly = false;
+
+            // Increment completed tasks
+            completedTasks++;
             uiManager.UpdateDisplayText(completedTasks, totalTasks);
+
+            // Prepare UI for next operation
+            uiManager.PrepareForNextOperation();
 
             if (completedTasks >= totalTasks)
             {
@@ -93,9 +138,12 @@ public class GameManager_CompleteOperation : MonoBehaviour
         }
     }
 
-
     private void EndGame()
     {
+
+        // Clear all cards from the slots 
+        slotManager.ClearAllSlots();
+
         if (Leaderboard_CompleteOperation.Instance == null)
         {
             UnityEngine.Debug.LogError("Leaderboard_CompleteOperation.Instance is null. Ensure the Leaderboard_CompleteOperation GameObject is in the scene.");
@@ -114,8 +162,9 @@ public class GameManager_CompleteOperation : MonoBehaviour
         // Display the final score
         uiManager.DisplayEndGameMessage();
         // Use UIManager to display the final score
-        uiManager.DisplayFinalScore(completedTasks, completionTime);
+        uiManager.DisplayFinalScore(completedTasks);
+        uiManager.ShowFinalScoreCanvas();
+
         UnityEngine.Debug.Log("Game ended successfully, and final text was updated.");
     }
-
 }

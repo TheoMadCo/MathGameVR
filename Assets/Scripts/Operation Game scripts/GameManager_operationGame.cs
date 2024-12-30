@@ -18,6 +18,13 @@ public class GameManager_operationGame : MonoBehaviour
     private string selectedDifficulty;
     private string selectedOperation;
 
+    [Header("Audio elements")]
+    public AudioSource audioSource;     // Audio source component
+    public AudioClip winSound;          // Sound played when winning
+    public AudioClip loseSound;         // Sound played when losing
+    public AudioClip newRoundSound;     // Sound played when winning
+    public AudioClip endGameSound;      // Sound played when losing
+
     // Reference to UIManager
     private UIManager_operationGame uiManager;
 
@@ -303,14 +310,15 @@ public class GameManager_operationGame : MonoBehaviour
         isQuestionAnsweredCorrectly = true;
         uiManager.SetContinueButtonActive(true);
         uiManager.ShowFeedbackMessage(GetPositiveFeedbackMessage());
+        audioSource.PlayOneShot(winSound, 1);
     }
 
     void HandleIncorrectAnswer(int selectedAnswer)
     {
         // Mark the incorrect answer button
         uiManager.MarkAnswerButton(selectedAnswer, false);
-
         uiManager.ShowFeedbackMessage(GetRetryMessage());
+        audioSource.PlayOneShot(loseSound, 1);
     }
 
     public void OnContinueButtonPressed()
@@ -319,6 +327,7 @@ public class GameManager_operationGame : MonoBehaviour
         {
             roundCount++;
             GenerateQuestion();
+            audioSource.PlayOneShot(newRoundSound, 1);
         }
     }
 
@@ -347,5 +356,6 @@ public class GameManager_operationGame : MonoBehaviour
     void ShowResult()
     {
         uiManager.ShowResultPanel(true, maxRounds);
+        audioSource.PlayOneShot(endGameSound, 1);
     }
 }

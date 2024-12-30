@@ -13,10 +13,26 @@ public class SlotManager_CompleteOperation : MonoBehaviour
         slotControllers[index].SetIncorrect(true);
     }
 
+    // Highlights a slot at index i as correct
+    public void HighlightCorrectSlot(int index)
+    {
+        slotControllers[index].SetCorrect(true);
+    }
+
     // Clears the highlight for a slot at index i
     public void ClearHighlightSlot(int index)
     {
         slotControllers[index].SetIncorrect(false);
+        slotControllers[index].SetCorrect(false);
+    }
+
+    // Clear all highlights
+    public void ClearAllHighlights()
+    {
+        for (int i = 0; i < slotControllers.Count; i++)
+        {
+            ClearHighlightSlot(i);
+        }
     }
 
     // Get the numbers placed in the slots, considering empty slots as nulls
@@ -36,6 +52,8 @@ public class SlotManager_CompleteOperation : MonoBehaviour
                 }
                 else
                 {
+                    // If the slot is empty, clear its highlight to the default material
+                    ClearHighlightSlot(i);
                     placedNumbers.Add(null);  // Treat empty active slots as null
                 }
             }
@@ -49,8 +67,6 @@ public class SlotManager_CompleteOperation : MonoBehaviour
         return placedNumbers;
     }
 
-
-
     // Clears all cards from the slots
     public void ClearAllSlots()
     {
@@ -63,6 +79,9 @@ public class SlotManager_CompleteOperation : MonoBehaviour
                 Destroy(selectedInteractable.transform.gameObject);
             }
         }
+
+        // Clear all highlights after clearing slots
+        ClearAllHighlights();
     }
 
     // Configures slots based on difficulty, enabling only the necessary ones
@@ -84,6 +103,4 @@ public class SlotManager_CompleteOperation : MonoBehaviour
 
         Debug.Log($"Configured slots for {difficulty} difficulty. Active columns: {activeColumns}");
     }
-
-
 }

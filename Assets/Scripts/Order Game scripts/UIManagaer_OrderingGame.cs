@@ -24,6 +24,8 @@ public class UIManager_OrderingGame : MonoBehaviour
     [Header("Audio")]
     public AudioClip correctOrderClip;
     public AudioClip incorrectOrderClip;
+    public AudioClip endGameClip;
+    public AudioClip newRoundClip;
 
     private AudioSource audioSource;
     private GameManager_OrderingGame gameManager;
@@ -96,10 +98,15 @@ public class UIManager_OrderingGame : MonoBehaviour
     {
         gameplayCanvas.SetActive(false);
         finalResultCanvas.SetActive(true);
+        if (audioSource != null && endGameClip != null)
+        {
+            audioSource.PlayOneShot(endGameClip, 1);
+        }
     }
 
     public void ResetTurnUI()
     {
+        audioSource.PlayOneShot(newRoundClip, 1);
         // Reset UI elements
         checkSolutionButton.gameObject.SetActive(true);
         continueButton.gameObject.SetActive(false);
