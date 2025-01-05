@@ -3,9 +3,9 @@ using UnityEngine.XR.Interaction.Toolkit;
 using UnityEngine;
 using UnityEngine.UI;
 using Unity.XR.CoreUtils;
+using System.Collections.Generic;
 
-
-public class MovementTutorialStep : MonoBehaviour
+public class MovementTutorialStep : MonoBehaviour, ITutorialStep
 {
     [Header("UI References")]
     public Canvas movementTutorialCanvas;
@@ -14,47 +14,110 @@ public class MovementTutorialStep : MonoBehaviour
 
     [Header("References")]
     public Transform teleportAnchor;
-    public UITutorialStep previousStep;
     public XROrigin xrRig; // Reference to the XR Rig
 
     [Header("References")]
     public TutorialSoundEffects soundEffects;
 
-    public event System.Action OnStepComplete; // Event that will be invoked when the step is completed
-
-    private void Start()
+    [System.Serializable]
+    public class ButtonHighlightInfo
     {
-
-        // Initially hide this step's canvas
-        movementTutorialCanvas.enabled = false;
-
-        // Listen to the previous step in order to start this step
-        if (previousStep != null)
-        {
-            previousStep.OnStepComplete += StartMovementTutorial; // Subscribe to the previous step (in this way we can chain the steps)
-        }
-
-        continueButton.onClick.AddListener(OnContinueButtonClick); // Subscribe to the button click event
+        public string buttonName;
+        public Material highlightMaterial;
+        public bool leftController = true;
+        public bool rightController = true;
     }
 
-    // This method will be called when the previous step is completed
-    private void StartMovementTutorial() 
+    [Tooltip("Controller highlight configurations for this tutorial step")]
+    public List<ButtonHighlightInfo> buttonHighlights = new List<ButtonHighlightInfo>();
+    private ControllerButtonHighlight leftControllerHighlight;
+    private ControllerButtonHighlight rightControllerHighlight;
+    private bool isHighlighted = false;
+
+    private TutorialManager tutorialManager;
+
+    public void StartStep(TutorialManager manager)
     {
-        // Tteleport the player
+        tutorialManager = manager;
+
+        // Teleport the player
         TeleportPlayer();
 
         // Enable the canvas and show instructions
         movementTutorialCanvas.enabled = true;
         ShowMovementInstructions();
+
+        // Add listener for the continue button
+        continueButton.onClick.AddListener(OnContinueButtonClick);
+
+        // Find controller references
+        leftControllerHighlight = null;
+        rightControllerHighlight = null;
+
+        // Highlight the controller buttons
+        HighlightController();
     }
 
-    // Teleport the player to the anchor's position
+    public void EndStep()
+    {
+        // Hide canvas and cleanup listeners
+        movementTutorialCanvas.enabled = false;
+        continueButton.onClick.RemoveListener(OnContinueButtonClick);
+        ResetHighlights();
+    }
+
+    private void HighlightController()
+    {
+        if (leftControllerHighlight == null)
+        {
+            var leftControllerFinded = GameObject.Find("XRControllerLeftwithHighLights(Clone)");
+            if (leftControllerFinded != null)
+            {
+                leftControllerHighlight = leftControllerFinded.GetComponent<ControllerButtonHighlight>();
+            }
+        }
+        if (rightControllerHighlight == null)
+        {
+            var rightControllerFinded = GameObject.Find("XRControllerRightwithHighLights(Clone)");
+            if (rightControllerFinded != null)
+            {
+                rightControllerHighlight = rightControllerFinded.GetComponent<ControllerButtonHighlight>();
+            }
+        }
+        if (!isHighlighted && rightControllerHighlight && leftControllerHighlight)
+        {
+            ApplyHighlights();
+            isHighlighted = true;
+        }
+    }
+
+    private void ApplyHighlights()
+    {
+        foreach (var highlight in buttonHighlights)
+        {
+            if (highlight.leftController && leftControllerHighlight != null)
+            {
+                leftControllerHighlight.HighlightButton(highlight.buttonName, highlight.highlightMaterial);
+            }
+            if (highlight.rightController && rightControllerHighlight != null)
+            {
+                rightControllerHighlight.HighlightButton(highlight.buttonName, highlight.highlightMaterial);
+            }
+        }
+    }
+
+    private void ResetHighlights()
+    {
+        leftControllerHighlight?.ResetAllHighlights();
+        rightControllerHighlight?.ResetAllHighlights();
+    }
+
     private void TeleportPlayer()
     {
         if (teleportAnchor != null && xrRig != null)
         {
             Vector3 heightAdjustedPosition = teleportAnchor.position;
-            heightAdjustedPosition.y = xrRig.transform.position.y;
+            heightAdjustedPosition.y = xrRig.transform.position.y; // Maintain current height
             xrRig.transform.position = heightAdjustedPosition;
         }
     }
@@ -70,21 +133,10 @@ public class MovementTutorialStep : MonoBehaviour
 
     private void OnContinueButtonClick()
     {
-        OnStepComplete?.Invoke(); // Invoke the event to notify that this step is completed
-        movementTutorialCanvas.enabled = false;
-        soundEffects.PlayNewRoundSound();
-    }
+        // Notify the TutorialManager to proceed to the next step
+        tutorialManager.ProceedToNextStep();
 
-    private void OnDestroy()
-    {
-        if (previousStep != null)
-        {
-            previousStep.OnStepComplete -= StartMovementTutorial; // Unsubscribe from the previous step
-        }
-
-        if (continueButton != null)
-        {
-            continueButton.onClick.RemoveListener(OnContinueButtonClick); // Unsubscribe from the button click event
-        }
+        // Play sound to indicate the step is complete
+        soundEffects?.PlayNewRoundSound();
     }
 }

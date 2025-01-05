@@ -205,7 +205,7 @@ public class UIManager_CompleteOperation : MonoBehaviour
 
         // Show result text again
         resultText.gameObject.SetActive(true);
-        resultText.text = "Risolvi l'operazione a destra pescando le carte numerate dai mazzi e posizionandole sugli spazi nella lavagna. \r\nQuando sei sicuro, premi su verifica"; // Clear previous message
+        resultText.text = "Risolvi l'operazione a destra pescando le carte numerate dai mazzi blu e posizionandole sugli spazi nella lavagna.\n\nDopo aver pescato una carta, muovila avanti e indietro con le levette.\r\n\nQuando sei sicuro, premi su VERIFICA"; // Clear previous message
 
         // Hide continue button
         if (continueButton != null)

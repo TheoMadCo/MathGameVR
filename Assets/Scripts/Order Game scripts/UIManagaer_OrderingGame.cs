@@ -43,7 +43,7 @@ public class UIManager_OrderingGame : MonoBehaviour
     {
         string sortingOrder = isAscendingOrder ? "Crescente" : "Decrescente";
         string currentDifficulty = difficulty == "Easy" ? "Facile" : difficulty == "Medium" ? "Media" : "Difficile"; // Italianized difficulty levels
-        feedbackText.text = $"Ordina i cubi in modo {sortingOrder} posizionandoli sui piedistalli gialli.";
+        feedbackText.text = $"Ordina i cubi in modo {sortingOrder} posizionandoli sui piedistalli gialli.\n\n"+"Usa le levette mentre hai in mano un cubo per spostarlo avanti e indietro";
         difficultyText.text = $"Stai giocando a difficoltà: {currentDifficulty}. Ancora {totalTurns - currentTurn} turni per finire il gioco";
     }
 

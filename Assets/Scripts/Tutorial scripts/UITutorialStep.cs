@@ -1,8 +1,9 @@
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class UITutorialStep : MonoBehaviour
+public class UITutorialStep : MonoBehaviour, ITutorialStep
 {
     [Header("UI References")]
     public Canvas tutorialCanvas;
@@ -23,16 +24,31 @@ public class UITutorialStep : MonoBehaviour
     [Header("References")]
     public TutorialSoundEffects soundEffects;
 
+    [System.Serializable]
+    public class ButtonHighlightInfo
+    {
+        public string buttonName;
+        public Material highlightMaterial;
+        public bool leftController = true;
+        public bool rightController = true;
+    }
+
+    [Tooltip("Controller highlight configurations for this tutorial step")]
+    public List<ButtonHighlightInfo> buttonHighlights = new List<ButtonHighlightInfo>();
+    private ControllerButtonHighlight leftControllerHighlight;
+    private ControllerButtonHighlight rightControllerHighlight;
+    private bool isHighlighted = false;
+
     private int clickCount = 0;
     private const int REQUIRED_CLICKS = 2;
     private Image practiceButtonImage;
 
-    public event System.Action OnStepComplete; // Event that will be invoked when the step is completed
+    private TutorialManager tutorialManager;
 
-    private void Start()
+    public void StartStep(TutorialManager manager)
     {
-        // Play new round sound
-        soundEffects.PlayNewRoundSound();
+        tutorialManager = manager;
+        soundEffects?.PlayNewRoundSound();
 
         practiceButtonImage = practiceButton.GetComponent<Image>();
 
@@ -45,6 +61,72 @@ public class UITutorialStep : MonoBehaviour
         continueButton.onClick.AddListener(OnContinueButtonClick);
 
         SetRandomButtonColor();
+
+        // Find controller references
+        leftControllerHighlight = null;
+        rightControllerHighlight = null;
+
+    }
+
+    //Necessary at the first step to allow the objects the time to be instantiated
+    private void Update()
+    {
+        HighlightController();
+    }
+
+    public void EndStep()
+    {
+        ResetHighlights();
+
+        tutorialCanvas.enabled = false;
+        practiceButton.onClick.RemoveListener(OnPracticeButtonClick);
+        continueButton.onClick.RemoveListener(OnContinueButtonClick);
+    }
+
+    private void HighlightController()
+    {
+        if (leftControllerHighlight == null)
+        {
+            var leftControllerFinded = GameObject.Find("XRControllerLeftwithHighLights(Clone)");
+            if (leftControllerFinded != null)
+            {
+                leftControllerHighlight = leftControllerFinded.GetComponent<ControllerButtonHighlight>();
+            }
+        }
+        if (rightControllerHighlight == null)
+        {
+            var rightControllerFinded = GameObject.Find("XRControllerRightwithHighLights(Clone)");
+            if (rightControllerFinded != null)
+            {
+                rightControllerHighlight = rightControllerFinded.GetComponent<ControllerButtonHighlight>();
+            }
+        }
+        if (!isHighlighted && rightControllerHighlight && leftControllerHighlight)
+        {
+            ApplyHighlights();
+            isHighlighted = true;
+        }
+    }
+
+    private void ApplyHighlights()
+    {
+        foreach (var highlight in buttonHighlights)
+        {
+            if (highlight.leftController && leftControllerHighlight != null)
+            {
+                leftControllerHighlight.HighlightButton(highlight.buttonName, highlight.highlightMaterial);
+            }
+            if (highlight.rightController && rightControllerHighlight != null)
+            {
+                rightControllerHighlight.HighlightButton(highlight.buttonName, highlight.highlightMaterial);
+            }
+        }
+    }
+
+    private void ResetHighlights()
+    {
+        leftControllerHighlight?.ResetAllHighlights();
+        rightControllerHighlight?.ResetAllHighlights();
     }
 
     private void OnPracticeButtonClick()
@@ -56,23 +138,21 @@ public class UITutorialStep : MonoBehaviour
         {
             EnableContinueButton();
         }
-        else if (clickCount <= REQUIRED_CLICKS) {
-            instructionText.text = "Ottimo! Ora clicca ancora il bottone per cambiare di nuovo colore";
+        else
+        {
+            instructionText.text = "Ottimo! Ora clicca ancora il bottone per cambiare di nuovo colore.";
         }
     }
 
     private void EnableContinueButton()
     {
         continueButton.gameObject.SetActive(true);
-        instructionText.text = "Fantastico! Hai imparato come usare i bottni. \r\n\r\n Continua a cambiare colore e quando vuoi premi su continua per proseguire il tutorial";
+        instructionText.text = "Fantastico! Hai imparato come usare i bottoni.\r\n\r\n Continua a cambiare colore e quando vuoi premi su continua per proseguire il tutorial.";
     }
 
     private void OnContinueButtonClick()
     {
-        OnStepComplete?.Invoke(); // Invoke the event to notify that the step is completed
-        tutorialCanvas.enabled = false; // Hide the canvas
-        // Play new round sound
-        soundEffects.PlayNewRoundSound();
+        tutorialManager.ProceedToNextStep();
     }
 
     private void SetRandomButtonColor()
@@ -80,10 +160,4 @@ public class UITutorialStep : MonoBehaviour
         int randomIndex = Random.Range(0, buttonColors.Length);
         practiceButtonImage.color = buttonColors[randomIndex];
     }
-
-    private void OnDestroy()
-    {
-        practiceButton.onClick.RemoveListener(OnPracticeButtonClick); // Unsubscribe from the button click event
-        continueButton.onClick.RemoveListener(OnContinueButtonClick); // Unsubscribe from the button click event
-    }   
 }

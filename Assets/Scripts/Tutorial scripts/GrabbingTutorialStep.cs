@@ -3,10 +3,9 @@ using UnityEngine.XR.Interaction.Toolkit;
 using UnityEngine;
 using UnityEngine.UI;
 using Unity.XR.CoreUtils;
+using System.Collections.Generic;
 
-
-
-public class GrabbingTutorialStep : MonoBehaviour
+public class GrabbingTutorialStep : MonoBehaviour, ITutorialStep
 {
     [Header("UI References")]
     public Canvas grabbingTutorialCanvas;
@@ -17,43 +16,116 @@ public class GrabbingTutorialStep : MonoBehaviour
     public Transform playerAnchor;
     public Transform tableSpawnPoint;
     public XROrigin xrRig;
-    public MovementTutorialStep previousStep;
 
     [Header("Prefab")]
-    public GameObject tableWithObjectsPrefab; // Single prefab containing table and all objects
+    public GameObject tableWithObjectsPrefab;
 
     [Header("References")]
     public TutorialSoundEffects soundEffects;
 
-    private GameObject spawnedSetup;
-
-    public event System.Action OnStepComplete;
-
-    private void Start()
+    [System.Serializable]
+    public class ButtonHighlightInfo
     {
-        // Initially hide canvas
-        grabbingTutorialCanvas.enabled = false;
-
-        // Listen to previous step completion
-        if (previousStep != null)
-        {
-            previousStep.OnStepComplete += StartGrabbingTutorial;
-        }
-
-        continueButton.onClick.AddListener(OnContinueButtonClick);
+        public string buttonName;
+        public Material highlightMaterial;
+        public bool leftController = true;
+        public bool rightController = true;
     }
 
-    private void StartGrabbingTutorial()
-    {
-        // First teleport player
-        TeleportPlayer();
+    [Tooltip("Controller highlight configurations for this tutorial step")]
+    public List<ButtonHighlightInfo> buttonHighlights = new List<ButtonHighlightInfo>();
+    private ControllerButtonHighlight leftControllerHighlight;
+    private ControllerButtonHighlight rightControllerHighlight;
+    private bool isHighlighted = false;
 
-        // Then spawn table setup
+    private GameObject spawnedSetup;
+    private TutorialManager tutorialManager;
+
+    public void StartStep(TutorialManager manager)
+    {
+        tutorialManager = manager;
+
+        // Enable the canvas for this step
+        grabbingTutorialCanvas.enabled = true;
+
+        // Teleport the player and set up the environment
+        TeleportPlayer();
         SpawnTableSetup();
 
-        // Finally show UI
+        // Show instructions
         ShowGrabbingInstructions();
-        grabbingTutorialCanvas.enabled = true;
+
+        // Add button listener
+        continueButton.onClick.AddListener(OnContinueButtonClick);
+
+        // Find controller references
+        leftControllerHighlight = null;
+        rightControllerHighlight = null;
+
+        // Highlight the controller buttons
+        HighlightController();
+    }
+
+    public void EndStep()
+    {
+        // Hide the canvas
+        grabbingTutorialCanvas.enabled = false;
+
+        // Remove button listener
+        continueButton.onClick.RemoveListener(OnContinueButtonClick);
+
+        // Cleanup the spawned setup
+        if (spawnedSetup != null)
+        {
+            Destroy(spawnedSetup);
+        }
+        ResetHighlights();
+    }
+
+    private void HighlightController()
+    {
+        if (leftControllerHighlight == null)
+        {
+            var leftControllerFinded = GameObject.Find("XRControllerLeftwithHighLights(Clone)");
+            if (leftControllerFinded != null)
+            {
+                leftControllerHighlight = leftControllerFinded.GetComponent<ControllerButtonHighlight>();
+            }
+        }
+        if (rightControllerHighlight == null)
+        {
+            var rightControllerFinded = GameObject.Find("XRControllerRightwithHighLights(Clone)");
+            if (rightControllerFinded != null)
+            {
+                rightControllerHighlight = rightControllerFinded.GetComponent<ControllerButtonHighlight>();
+            }
+        }
+        if (!isHighlighted && rightControllerHighlight && leftControllerHighlight)
+        {
+            ApplyHighlights();
+            isHighlighted = true;
+        }
+    }
+
+    private void ApplyHighlights()
+    {
+        foreach (var highlight in buttonHighlights)
+        {
+            if (highlight.leftController && leftControllerHighlight != null)
+            {
+                leftControllerHighlight.HighlightButton(highlight.buttonName, highlight.highlightMaterial);
+            }
+            if (highlight.rightController && rightControllerHighlight != null)
+            {
+                rightControllerHighlight.HighlightButton(highlight.buttonName, highlight.highlightMaterial);
+            }
+        }
+    }
+
+    private void ResetHighlights()
+    {
+        leftControllerHighlight?.ResetAllHighlights();
+        rightControllerHighlight?.ResetAllHighlights();
     }
 
     private void TeleportPlayer()
@@ -63,8 +135,6 @@ public class GrabbingTutorialStep : MonoBehaviour
             Vector3 heightAdjustedPosition = playerAnchor.position;
             heightAdjustedPosition.y = xrRig.transform.position.y;
             xrRig.transform.position = heightAdjustedPosition;
-
-            // Rotate player to face the table
             xrRig.transform.rotation = playerAnchor.rotation;
         }
     }
@@ -74,8 +144,8 @@ public class GrabbingTutorialStep : MonoBehaviour
         if (tableWithObjectsPrefab != null && tableSpawnPoint != null)
         {
             spawnedSetup = Instantiate(tableWithObjectsPrefab,
-                                     tableSpawnPoint.position,
-                                     tableSpawnPoint.rotation);
+                                        tableSpawnPoint.position,
+                                        tableSpawnPoint.rotation);
         }
     }
 
@@ -91,27 +161,7 @@ public class GrabbingTutorialStep : MonoBehaviour
 
     private void OnContinueButtonClick()
     {
-        OnStepComplete?.Invoke();
-        Destroy(spawnedSetup);
-        grabbingTutorialCanvas.enabled = false;
+        tutorialManager.ProceedToNextStep();
         soundEffects.PlayNewRoundSound();
-    }
-
-    private void OnDestroy()
-    {
-        if (previousStep != null)
-        {
-            previousStep.OnStepComplete -= StartGrabbingTutorial;
-        }
-
-        if (continueButton != null)
-        {
-            continueButton.onClick.RemoveListener(OnContinueButtonClick);
-        }
-
-        if (spawnedSetup != null)
-        {
-            Destroy(spawnedSetup);
-        }
     }
 }

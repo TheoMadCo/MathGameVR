@@ -2,8 +2,9 @@ using TMPro;
 using UnityEngine.XR.Interaction.Toolkit;
 using UnityEngine;
 using Unity.XR.CoreUtils;
+using System.Collections.Generic;
 
-public class SocketTutorialStep : MonoBehaviour
+public class SocketTutorialStep : MonoBehaviour, ITutorialStep
 {
     [Header("UI References")]
     public Canvas socketTutorialCanvas;
@@ -14,7 +15,6 @@ public class SocketTutorialStep : MonoBehaviour
     public Transform playerAnchor;
     public Transform setupSpawnPoint;
     public XROrigin xrRig;
-    public GrabbingTutorialStep previousStep;
     public XRSocketInteractor keySocket;
 
     [Header("Prefab")]
@@ -23,34 +23,112 @@ public class SocketTutorialStep : MonoBehaviour
     [Header("References")]
     public TutorialSoundEffects soundEffects;
 
-    private GameObject spawnedSetup;
-
-    public event System.Action OnStepComplete;
-
-    private void Start()
+    [System.Serializable]
+    public class ButtonHighlightInfo
     {
-        // Initially hide canvases
-        socketTutorialCanvas.enabled = false;
-        endTutorialCanvas.enabled = false;
+        public string buttonName;
+        public Material highlightMaterial;
+        public bool leftController = true;
+        public bool rightController = true;
+    }
 
-        if (previousStep != null)
-        {
-            previousStep.OnStepComplete += StartSocketTutorial;
-        }
+    [Tooltip("Controller highlight configurations for this tutorial step")]
+    public List<ButtonHighlightInfo> buttonHighlights = new List<ButtonHighlightInfo>();
+    private ControllerButtonHighlight leftControllerHighlight;
+    private ControllerButtonHighlight rightControllerHighlight;
+    private bool isHighlighted = false;
+
+    private GameObject spawnedSetup;
+    private TutorialManager tutorialManager;
+
+    public void StartStep(TutorialManager manager)
+    {
+        tutorialManager = manager;
+
+        // Teleport the player and set up the environment
+        TeleportPlayer();
+        SpawnTableSetup();
+
+        // Show instructions and enable canvas
+        ShowSocketInstructions();
+        socketTutorialCanvas.enabled = true;
 
         // Listen for key socket interactions
         if (keySocket != null)
         {
             keySocket.selectEntered.AddListener(OnKeyInserted);
         }
+
+        // Find controller references
+        leftControllerHighlight = null;
+        rightControllerHighlight = null;
+
+        // Highlight the controller buttons
+        HighlightController();
     }
 
-    private void StartSocketTutorial()
+    public void EndStep()
     {
-        TeleportPlayer();
-        SpawnTableSetup();
-        ShowSocketInstructions();
-        socketTutorialCanvas.enabled = true;
+        // Cleanup and disable canvases
+        socketTutorialCanvas.enabled = false;
+        endTutorialCanvas.enabled = false;
+
+        if (keySocket != null)
+        {
+            keySocket.selectEntered.RemoveListener(OnKeyInserted);
+        }
+
+        if (spawnedSetup != null)
+        {
+            Destroy(spawnedSetup);
+        }
+        ResetHighlights();
+    }
+
+    private void HighlightController()
+    {
+        if (leftControllerHighlight == null)
+        {
+            var leftControllerFinded = GameObject.Find("XRControllerLeftwithHighLights(Clone)");
+            if (leftControllerFinded != null)
+            {
+                leftControllerHighlight = leftControllerFinded.GetComponent<ControllerButtonHighlight>();
+            }
+        }
+        if (rightControllerHighlight == null)
+        {
+            var rightControllerFinded = GameObject.Find("XRControllerRightwithHighLights(Clone)");
+            if (rightControllerFinded != null)
+            {
+                rightControllerHighlight = rightControllerFinded.GetComponent<ControllerButtonHighlight>();
+            }
+        }
+        if (!isHighlighted && rightControllerHighlight && leftControllerHighlight)
+        {
+            ApplyHighlights();
+            isHighlighted = true;
+        }
+    }
+
+    private void ApplyHighlights()
+    {
+        foreach (var highlight in buttonHighlights)
+        {
+            if (highlight.leftController && leftControllerHighlight != null)
+            {
+                leftControllerHighlight.HighlightButton(highlight.buttonName, highlight.highlightMaterial);
+            }
+            if (highlight.rightController && rightControllerHighlight != null)
+            {
+                rightControllerHighlight.HighlightButton(highlight.buttonName, highlight.highlightMaterial);
+            }
+        }
+    }
+
+    private void ResetHighlights()
+    {
+        leftControllerHighlight?.ResetAllHighlights();
+        rightControllerHighlight?.ResetAllHighlights();
     }
 
     private void TeleportPlayer()
@@ -58,7 +136,7 @@ public class SocketTutorialStep : MonoBehaviour
         if (playerAnchor != null && xrRig != null)
         {
             Vector3 heightAdjustedPosition = playerAnchor.position;
-            heightAdjustedPosition.y = xrRig.transform.position.y;
+            heightAdjustedPosition.y = xrRig.transform.position.y; // Maintain player height
             xrRig.transform.position = heightAdjustedPosition;
             xrRig.transform.rotation = playerAnchor.rotation;
         }
@@ -69,8 +147,8 @@ public class SocketTutorialStep : MonoBehaviour
         if (tableWithKeyPrefab != null && setupSpawnPoint != null)
         {
             spawnedSetup = Instantiate(tableWithKeyPrefab,
-                                     setupSpawnPoint.position,
-                                     setupSpawnPoint.rotation);
+                                        setupSpawnPoint.position,
+                                        setupSpawnPoint.rotation);
         }
     }
 
@@ -85,46 +163,30 @@ public class SocketTutorialStep : MonoBehaviour
 
     private void OnKeyInserted(SelectEnterEventArgs args)
     {
-        // Check if the inserted object is indeed the key
+        // Verify the correct object (key) was inserted
         if (args.interactableObject.transform.CompareTag("Key"))
         {
-            // Play win sound
-            soundEffects.PlayWinSound();
+            // Play success sound
+            soundEffects?.PlayWinSound();
 
-            ShowEndTutorial();
+            // Notify the manager to proceed to the next step
+            tutorialManager.ProceedToNextStep();
         }
     }
+
 
     private void ShowEndTutorial()
     {
-        // Hide socket tutorial canvas
+        // Hide the socket tutorial canvas
         socketTutorialCanvas.enabled = false;
 
-        // Show end tutorial canvas
+        // Show the end tutorial canvas
         endTutorialCanvas.enabled = true;
 
         // Play end tutorial sound
-        soundEffects.PlayEndGameSound();
+        soundEffects?.PlayEndGameSound();
 
-        // You might want to trigger any end tutorial effects here
-        OnStepComplete?.Invoke();
-    }
-
-    private void OnDestroy()
-    {
-        if (previousStep != null)
-        {
-            previousStep.OnStepComplete -= StartSocketTutorial;
-        }
-
-        if (keySocket != null)
-        {
-            keySocket.selectEntered.RemoveListener(OnKeyInserted);
-        }
-
-        if (spawnedSetup != null)
-        {
-            Destroy(spawnedSetup);
-        }
+        // Notify the TutorialManager to proceed to the next step
+        tutorialManager.ProceedToNextStep();
     }
 }
