@@ -125,9 +125,9 @@ public class MovementTutorialStep : MonoBehaviour, ITutorialStep
     private void ShowMovementInstructions()
     {
         instructionText.text = "Ora impariamo come muoverci:\n\n" +
-            "1. Punta il controller sul pavimento, vedrai un arco blu\n" +
+            "1. Punta il controller sul pavimento, vedrai un arco <color=blue>Blu</color>\n" +
             "2. Scegli un punto dove vuoi teletrasportarti\n" +
-            "3. Premi il grilletto sotto il tuo dito medio per teletrasportati nel punto indicato\n" +
+            "3. Premi il <color=green>grilletto verde</color> sotto il tuo dito medio per teletrasportati nel punto indicato\n\n" +
             "Fai pratica con il movimento. Quando ti senti pronto, avvicinati alla lavagna premi su continua per proseguire il tutorial.";
     }
 
