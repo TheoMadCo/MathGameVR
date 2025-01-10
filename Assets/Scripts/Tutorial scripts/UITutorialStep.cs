@@ -13,7 +13,7 @@ public class UITutorialStep : MonoBehaviour, ITutorialStep
 
     [Header("Settings")]
     [SerializeField]
-    private Color[] buttonColors = new Color[]
+    public Color[] buttonColors = new Color[]
     {
         Color.red,
         Color.blue,
@@ -55,7 +55,7 @@ public class UITutorialStep : MonoBehaviour, ITutorialStep
         // Setup initial state
         tutorialCanvas.enabled = true;
         continueButton.gameObject.SetActive(false);
-        instructionText.text = "In questo Tutorial imparerai a muoverti nel gioco\r\n\r\nLa prima cosa da imparare è come usare i bottoni. \r\nPunta il bottone con il raggio colorato che esce dalla tua mano, e quando diventerà blu, usa il <color=green>grilletto verde</color> sotto il tuo indice per cliccarlo.";
+        instructionText.text = "In questo Tutorial imparerai a muoverti nel gioco\r\n\r\nLa prima cosa da imparare è come usare i bottoni. \r\nPunta il bottone con il raggio colorato che esce dalla tua mano, e quando diventerà <color=#0fd1cb>blu</color>, usa il <color=#0fd1cb>grilletto lampeggiante</color> sotto il tuo indice per cliccarlo.";
 
         practiceButton.onClick.AddListener(OnPracticeButtonClick);
         continueButton.onClick.AddListener(OnContinueButtonClick);

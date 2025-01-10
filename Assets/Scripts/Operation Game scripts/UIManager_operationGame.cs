@@ -2,6 +2,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using System.Collections.Generic;
+using System.Collections;
+using System.Security;
 
 public class UIManager_operationGame : MonoBehaviour
 {
@@ -62,7 +64,9 @@ public class UIManager_operationGame : MonoBehaviour
 
     public void DisplayDifficulty(string difficulty)
     {
-        difficultyText.text = "Difficoltà: " + difficulty;
+        // italianize the difficulty
+        string currentDifficulty = difficulty == "Easy" ? "Facile" : difficulty == "Medium" ? "Media" : "Difficile"; // Italianized difficulty levels
+        difficultyText.text = "Difficoltà: " + currentDifficulty;
     }
 
     public void ShowFeedbackMessage(string message)

@@ -152,9 +152,9 @@ public class GrabbingTutorialStep : MonoBehaviour, ITutorialStep
     private void ShowGrabbingInstructions()
     {
         instructionText.text = "Puoi anche afferrare gli oggetti!\n\n" +
-            "1. Punta il controller su un oggetto, vedrai la linea <color=blue>Blu</color>\n" +
-            "2. Tieni premuto il <color=green>grilletto verde</color> sotto il tuo dito medio per afferrarlo\n" +
-            "3. Ora puoi usare le <color=green>levette verdi</color> per ruotarlo e muoverlo avanti e indietro!\n\n" +
+            "1. Punta il controller su un oggetto, vedrai la linea <color=#0fd1cb>Blu</color>\n" +
+            "2. Tieni premuto il <color=#0fd1cb>grilletto lampeggiante</color> sotto il tuo dito medio per afferrarlo\n" +
+            "3. Ora puoi usare le <color=#0fd1cb>levette lampeggianti</color> per ruotarlo e muoverlo avanti e indietro!\n\n" +
             "Puoi anche avvicinarti con la mano e afferrarlo come se fosse reale.\n" +
             "Prova liberamente a giocare con gli oggetti, poi premi continua per proseguire.";
     }

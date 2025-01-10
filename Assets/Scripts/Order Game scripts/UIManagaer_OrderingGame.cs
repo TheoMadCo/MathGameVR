@@ -43,7 +43,7 @@ public class UIManager_OrderingGame : MonoBehaviour
     {
         string sortingOrder = isAscendingOrder ? "Crescente" : "Decrescente";
         string currentDifficulty = difficulty == "Easy" ? "Facile" : difficulty == "Medium" ? "Media" : "Difficile"; // Italianized difficulty levels
-        feedbackText.text = $"Ordina i cubi in modo {sortingOrder} posizionandoli sui piedistalli gialli.\n\n"+"Usa le levette mentre hai in mano un cubo per spostarlo avanti e indietro";
+        feedbackText.text = $"Ordina i cubi in modo <color=#0fd1cb>{sortingOrder}</color> posizionandoli sui piedistalli gialli.\n\n";
         difficultyText.text = $"Stai giocando a difficoltà: {currentDifficulty}. Ancora {totalTurns - currentTurn} turni per finire il gioco";
     }
 
@@ -91,7 +91,7 @@ public class UIManager_OrderingGame : MonoBehaviour
         audioSource.PlayOneShot(incorrectOrderClip, 1);
 
         // Update feedback text with encouragement
-        feedbackText.text = $"Accidenti! Alcuni blocchi sono fuori posto. Riposiziona quelli in rosso! Ricordati di ordinarli in modo {sortingOrder}";
+        feedbackText.text = $"Accidenti! Alcuni blocchi sono fuori posto. Riposiziona quelli in rosso! Ricordati di ordinarli in modo <color=#0fd1cb>{sortingOrder}</color>";
     }
 
     public void ShowFinalResultCanvas()

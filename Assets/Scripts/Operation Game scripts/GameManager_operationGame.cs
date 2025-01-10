@@ -336,7 +336,7 @@ public class GameManager_operationGame : MonoBehaviour
         string[] messages = {
             "Ottimo lavoro! Risposta corretta!",
             "Fantastico! La risposta è corretta!",
-            "Rispota giusta! Continua così",
+            "Risposta giusta! Continua così",
             "Molto bene! Risposta giusta"
         };
         return messages[Random.Range(0, messages.Length)];
