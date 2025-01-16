@@ -8,8 +8,9 @@ public class TutorialManager : MonoBehaviour
     [Tooltip("Drag and drop all tutorial steps here in the order they should play.")]
     public List<MonoBehaviour> tutorialSteps; // Each step must implement ITutorialStep
 
-    [Tooltip("Canvas to display when the tutorial is completed.")]
+    [Tooltip("Canvases to display when the tutorial is completed.")]
     public Canvas endTutorialCanvas;
+    public Canvas finalTooltipCanvas;
 
     private int currentStepIndex = -1;
 
@@ -32,6 +33,7 @@ public class TutorialManager : MonoBehaviour
         if (endTutorialCanvas != null)
         {
             endTutorialCanvas.enabled = false;
+            finalTooltipCanvas.enabled = false;
         }
 
         ProceedToNextStep();
@@ -78,6 +80,7 @@ public class TutorialManager : MonoBehaviour
         if (endTutorialCanvas != null)
         {
             endTutorialCanvas.enabled = true;
+            finalTooltipCanvas.enabled = true;
         }
 
         Debug.Log("Tutorial completed! Showing the end game canvas.");

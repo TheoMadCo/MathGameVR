@@ -140,8 +140,6 @@ public class GameManager_CompleteOperation : MonoBehaviour
 
     private void EndGame()
     {
-
-        // Clear all cards from the slots 
         slotManager.ClearAllSlots();
 
         if (Leaderboard_CompleteOperation.Instance == null)
@@ -153,18 +151,25 @@ public class GameManager_CompleteOperation : MonoBehaviour
         stopwatch.Stop();  // Stop the timer
         float completionTime = (float)stopwatch.Elapsed.TotalSeconds;
 
-        // Save the session to the leaderboard
-        Leaderboard_CompleteOperation.Instance.AddEntry(playerName, "Complete Operation", completionTime, completedTasks, totalTasks);
+        // Save the session to the leaderboard with difficulty and actual operationType
+        Leaderboard_CompleteOperation.Instance.AddEntry(
+            playerName,
+            operationGenerator.operationType.ToString(),
+            selectedDifficulty.ToString(),
+            completionTime,
+            completedTasks,
+            totalTasks
+        );
 
         // Export leaderboard to CSV
         Leaderboard_CompleteOperation.Instance.ExportToCSV();
 
-        // Display the final score
-        uiManager.DisplayEndGameMessage();
-        // Use UIManager to display the final score
-        uiManager.DisplayFinalScore(completedTasks);
+        // Display the final score with completion time
+        uiManager.DisplayEndGameMessage(completionTime);
+        uiManager.DisplayFinalScore(completedTasks, completionTime);
         uiManager.ShowFinalScoreCanvas();
 
-        UnityEngine.Debug.Log("Game ended successfully, and final text was updated.");
+        UnityEngine.Debug.Log($"Game ended successfully in {completionTime} seconds");
     }
+
 }

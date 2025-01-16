@@ -7,6 +7,7 @@ public class UIManager_OrderingGame : MonoBehaviour
     [Header("UI Elements")]
     public TextMeshPro feedbackText;
     public TextMeshPro difficultyText;
+    public TextMeshPro finalResultText;
     public Button checkSolutionButton;
     public Button continueButton;
     public GameObject gameplayCanvas;
@@ -69,7 +70,7 @@ public class UIManager_OrderingGame : MonoBehaviour
         SetButtonInteractable(false);
     }
 
-    public void HandleCorrectSolution(int currentTurn, int totalTurns)
+    public void HandleCorrectSolution(int currentTurn, int totalTurns, int pointsEarned, int maxPoints)
     {
         // Play correct order audio
         audioSource.PlayOneShot(correctOrderClip, 1);
@@ -78,31 +79,36 @@ public class UIManager_OrderingGame : MonoBehaviour
         checkSolutionButton.gameObject.SetActive(false);
         continueButton.gameObject.SetActive(true);
 
-        // Update feedback text
-        feedbackText.text = $"Bravo! Hai completato il turno {currentTurn}/{totalTurns}. Premi Continua!";
+        // Update feedback text with earned points
+        feedbackText.text = $"Bravo! Hai completato il turno {currentTurn} di {totalTurns}.\n Hai guadagnato <color=#0fd1cb>{pointsEarned} punti</color> su {maxPoints}.\n Premi Continua!";
     }
 
-    public void HandleIncorrectSolution(bool isAscendingOrder)
-    {
 
+    public void HandleIncorrectSolution(bool isAscendingOrder, int pointsLost, int maxPoints)
+    {
         string sortingOrder = isAscendingOrder ? "Crescente" : "Decrescente";
 
         // Play incorrect order audio
         audioSource.PlayOneShot(incorrectOrderClip, 1);
 
-        // Update feedback text with encouragement
-        feedbackText.text = $"Accidenti! Alcuni blocchi sono fuori posto. Riposiziona quelli in rosso! Ricordati di ordinarli in modo <color=#0fd1cb>{sortingOrder}</color>";
+        // Update feedback text with points lost
+        feedbackText.text = $"Accidenti! Alcuni blocchi sono fuori posto. <color=#F96990> Hai perso 1 punto </color>su {maxPoints} possibili.\n Ricordati di ordinarli in modo <color=#0fd1cb>{sortingOrder}</color>";
     }
 
-    public void ShowFinalResultCanvas()
+
+    public void ShowFinalResultCanvas(int currentScore, int maxPossibleScore)
     {
         gameplayCanvas.SetActive(false);
         finalResultCanvas.SetActive(true);
+
         if (audioSource != null && endGameClip != null)
         {
             audioSource.PlayOneShot(endGameClip, 1);
         }
+
+        finalResultText.text = $"Complimenti!\n Hai totalizzato <color=#0fd1cb>{currentScore} punti</color> su un massimo di {maxPossibleScore}.\n\nGioca di nuovo oppure Esci dal gico.";
     }
+
 
     public void ResetTurnUI()
     {

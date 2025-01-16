@@ -114,15 +114,26 @@ public class UIManager_CompleteOperation : MonoBehaviour
     }
 
     // Displays the final score with the number of completed tasks
-    public void DisplayFinalScore(int completedTasks)
+    public void DisplayFinalScore(int completedTasks, float completionTimeInSeconds)
     {
-        scoreText.text = $"Complimenti! Hai completato corrrettamente {completedTasks} operazioni!";
+        // Convert seconds to minutes and seconds
+        int minutes = Mathf.FloorToInt(completionTimeInSeconds / 60);
+        int seconds = Mathf.FloorToInt(completionTimeInSeconds % 60);
+
+        scoreText.text = $"Complimenti!\n Hai completato corrrettamente {completedTasks} operazioni!\n" +
+                        $"Tempo impiegato: <color=#0fd1cb>{minutes} minuti e {seconds} secondi</color>";
     }
 
-    // Displays the endgame message when the game is completed
-    public void DisplayEndGameMessage()
+    // Display the result when the game is completed with completion time
+    public void DisplayEndGameMessage(float completionTimeInSeconds)
     {
-        resultText.text = "Complimenti! Hai completato tutte le operazioni correttamente!\r\n\r\nPremi su Esci oppure ricomincia il gioco!";
+        // Convert seconds to minutes and seconds
+        int minutes = Mathf.FloorToInt(completionTimeInSeconds / 60);
+        int seconds = Mathf.FloorToInt(completionTimeInSeconds % 60);
+
+        resultText.text = $"Complimenti!\n Hai completato tutte le operazioni correttamente!\n" +
+                         $"Tempo impiegato: <color=#0fd1cb>{minutes} minuti e {seconds} secondi</color>\n\n" +
+                         "Premi su Esci oppure ricomincia il gioco!";
     }
 
     // Displays whether the player wins or loses a round

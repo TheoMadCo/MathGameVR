@@ -20,6 +20,15 @@ public class GameManager_OrderingGame : MonoBehaviour
     public int totalTurns = 3;
     public int currentTurn = 1;
 
+    [Header("Score Management")]
+    public int currentScore = 0; // Total score across all rounds
+    private int pointsLostThisRound = 0; // Points lost in the current round
+    private int maxPointsPerTurn; // Maximum points available for the current round
+
+
+    [Header("Player Information")]
+    public string playerName = "Player"; // Default name, can be set in the Inspector
+
     [Header("Debug")]
     public bool enableDebugLogging = true;
 
@@ -59,24 +68,26 @@ public class GameManager_OrderingGame : MonoBehaviour
         {
             case "easy":
                 numberOfPlates = easyBlockCount;
+                maxPointsPerTurn = easyBlockCount; // 3
                 break;
             case "medium":
                 numberOfPlates = mediumBlockCount;
+                maxPointsPerTurn = mediumBlockCount; // 5
                 break;
             case "hard":
                 numberOfPlates = hardBlockCount;
+                maxPointsPerTurn = hardBlockCount; // 8
                 break;
             default:
                 numberOfPlates = easyBlockCount;
+                maxPointsPerTurn = easyBlockCount;
                 break;
         }
 
-        // Randomly decide sorting order
-        isAscendingOrder = Random.value > 0.5f;
-
-        // Update UI feedback text
+        isAscendingOrder = UnityEngine.Random.value > 0.5f;
         uiManager.UpdateFeedbackText(difficulty, currentTurn, totalTurns, isAscendingOrder);
     }
+
 
     public void GeneratePlatesAndBlocks()
     {
@@ -184,7 +195,6 @@ public class GameManager_OrderingGame : MonoBehaviour
         List<int> blockNumbers = new List<int>();
         List<GameObject> blockObjects = new List<GameObject>();
 
-        // Collect block numbers and objects in order
         foreach (GameObject plate in spawnedPlates)
         {
             XRSocketInteractor socket = plate.GetComponentInChildren<XRSocketInteractor>();
@@ -199,26 +209,33 @@ public class GameManager_OrderingGame : MonoBehaviour
             }
         }
 
-        // Debug logging for input numbers
-        string inputNumbersDebug = $"Input Numbers ({(isAscendingOrder ? "Ascending" : "Descending")}): {string.Join(", ", blockNumbers)}";
-        DebugLog(inputNumbersDebug);
-
-        // Comprehensive solution check
         bool[] blockPositions = GetBlockPositions(blockNumbers);
         bool isCompleteSolutionCorrect = IsCompleteSolutionCorrect(blockNumbers, blockPositions);
 
-        // Color blocks based on their correctness
+        // If incorrect, show feedback and increment mistakes
+        if (!isCompleteSolutionCorrect)
+        {
+            pointsLostThisRound++;
+            int pointsRemaining = Mathf.Max(1, maxPointsPerTurn - pointsLostThisRound);
+            uiManager.HandleIncorrectSolution(isAscendingOrder, pointsLostThisRound, maxPointsPerTurn);
+            uiManager.ColorBlocks(blockObjects.ToArray(), blockPositions);
+            return;
+        }
+
+        // Calculate points for this round
+        int pointsEarnedThisRound = Mathf.Max(1, maxPointsPerTurn - pointsLostThisRound);
+        currentScore += pointsEarnedThisRound;
+
+        // Show correct feedback and update points
+        uiManager.HandleCorrectSolution(currentTurn, totalTurns, pointsEarnedThisRound, maxPointsPerTurn);
         uiManager.ColorBlocks(blockObjects.ToArray(), blockPositions);
 
-        if (isCompleteSolutionCorrect)
-        {
-            uiManager.HandleCorrectSolution(currentTurn, totalTurns);
-        }
-        else
-        {
-            uiManager.HandleIncorrectSolution(isAscendingOrder);
-        }
+        // Prepare for the next round
+        pointsLostThisRound = 0; // Reset for the next round
     }
+
+
+
 
     private List<int> GenerateExpectedOrder(List<int> inputNumbers)
     {
@@ -289,17 +306,24 @@ public class GameManager_OrderingGame : MonoBehaviour
 
         if (currentTurn <= totalTurns)
         {
-            // Reset UI for next turn
             uiManager.ResetTurnUI();
-
-            // Regenerate plates and blocks
             SetDifficulty(selectedDifficulty);
             GeneratePlatesAndBlocks();
         }
         else
         {
-            // Game completed, show final result canvas
-            uiManager.ShowFinalResultCanvas();
+            if (LeaderBoard_orderingGame.Instance != null)
+            {
+                LeaderBoard_orderingGame.Instance.AddEntry(
+                    playerName,
+                    selectedDifficulty,
+                    currentScore,
+                    totalTurns * maxPointsPerTurn // Maximum possible score
+                );
+            }
+
+            uiManager.ShowFinalResultCanvas(currentScore, totalTurns * maxPointsPerTurn);
         }
     }
+
 }

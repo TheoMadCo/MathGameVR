@@ -36,6 +36,7 @@ public class UIManager_operationGame : MonoBehaviour
 
         // Set up continue button listener
         continueButton.onClick.AddListener(OnContinueButtonPressed);
+
     }
 
     public void DisplayQuestion(string questionStr)
@@ -106,14 +107,14 @@ public class UIManager_operationGame : MonoBehaviour
         gamePanel.SetActive(show);
     }
 
-    public void ShowResultPanel(bool show, int maxRounds)
+    public void ShowResultPanel(bool show, int maxRounds, int totalPoints = 0, int maxPossiblePoints = 0)
     {
         gamePanel.SetActive(!show);
         resultPanel.SetActive(show);
 
         if (show)
         {
-            resultText.text = $"Hai completato {maxRounds} rounds!\nBella esercitazione!";
+            resultText.text = $"Hai completato {maxRounds} rounds!\nBella esercitazione!\n\nHai ottenuto <color=#0fd1cb>{totalPoints} punti</color> su {maxPossiblePoints}";
         }
     }
 

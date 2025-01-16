@@ -7,6 +7,11 @@ public class GameManager_operationGame : MonoBehaviour
     [Header("Game Settings")]
     public int maxRounds = 10;
 
+    [Header("Point System")]
+    private int currentRoundPoints = 0;
+    private int totalPoints = 0;
+    private int currentRoundErrors = 0;
+
     [Header("Difficulty Settings")]
     private int minRange = 1;
     private int maxRange = 11;
@@ -17,6 +22,7 @@ public class GameManager_operationGame : MonoBehaviour
 
     private string selectedDifficulty;
     private string selectedOperation;
+    private string userName;
 
     [Header("Audio elements")]
     public AudioSource audioSource;     // Audio source component
@@ -28,6 +34,9 @@ public class GameManager_operationGame : MonoBehaviour
     // Reference to UIManager
     private UIManager_operationGame uiManager;
 
+    // Reference to LeaderBoard
+    [SerializeField] private LeaderBoard_operationGame leaderBoard;
+
     void Start()
     {
         // Get the UIManager component
@@ -36,13 +45,21 @@ public class GameManager_operationGame : MonoBehaviour
         // Fetch the selected difficulty and operation from PlayerPrefs
         selectedDifficulty = PlayerPrefs.GetString("Difficulty", "Easy");
         selectedOperation = PlayerPrefs.GetString("Operation", "Addition");
+        userName = PlayerPrefs.GetString("UserName", "Player");
 
         SetDifficultyRanges();
         uiManager.DisplayDifficulty(selectedDifficulty);
 
         roundCount = 0;
+        totalPoints = 0;
         uiManager.ShowResultPanel(false, maxRounds);
         uiManager.SetContinueButtonActive(false);
+
+        // Verify LeaderBoard reference
+        if (leaderBoard == null)
+        {
+            Debug.LogError("LeaderBoard_operationGame reference not set in inspector!");
+        }
 
         GenerateQuestion();
     }
@@ -263,6 +280,8 @@ public class GameManager_operationGame : MonoBehaviour
 
         // Reset question-specific variables
         isQuestionAnsweredCorrectly = false;
+        currentRoundErrors = 0;
+        currentRoundPoints = 0;
         uiManager.SetContinueButtonActive(false);
         uiManager.ShowFeedbackMessage("");
         uiManager.ResetButtonAppearance();
@@ -304,17 +323,37 @@ public class GameManager_operationGame : MonoBehaviour
 
     void HandleCorrectAnswer(int selectedAnswer)
     {
+        // Calculate points based on errors
+        switch (currentRoundErrors)
+        {
+            case 0:
+                currentRoundPoints = 3;
+                break;
+            case 1:
+                currentRoundPoints = 2;
+                break;
+            case 2:
+                currentRoundPoints = 1;
+                break;
+            default:
+                currentRoundPoints = 0;
+                break;
+        }
+
+        totalPoints += currentRoundPoints;
+
         // Mark the correct answer button
         uiManager.MarkAnswerButton(selectedAnswer, true);
 
         isQuestionAnsweredCorrectly = true;
         uiManager.SetContinueButtonActive(true);
-        uiManager.ShowFeedbackMessage(GetPositiveFeedbackMessage());
+        uiManager.ShowFeedbackMessage(GetPositiveFeedbackMessage() + $"\nHai guadagnato: <color=#0fd1cb>{currentRoundPoints}</color> punti su 3");
         audioSource.PlayOneShot(winSound, 1);
     }
 
     void HandleIncorrectAnswer(int selectedAnswer)
     {
+        currentRoundErrors++;
         // Mark the incorrect answer button
         uiManager.MarkAnswerButton(selectedAnswer, false);
         uiManager.ShowFeedbackMessage(GetRetryMessage());
@@ -355,7 +394,28 @@ public class GameManager_operationGame : MonoBehaviour
 
     void ShowResult()
     {
-        uiManager.ShowResultPanel(true, maxRounds);
+        // Save to leaderboard before showing results
+        if (leaderBoard != null)
+        {
+            leaderBoard.AddEntry(
+                userName,
+                selectedDifficulty,
+                selectedOperation,
+                totalPoints,
+                maxRounds * 3 // maximum possible points (3 points per round)
+            );
+
+            // Export to CSV after adding the entry
+            leaderBoard.ExportToCSV();
+
+            Debug.Log($"Game completed - Score saved: {totalPoints} points for user {userName}");
+        }
+        else
+        {
+            Debug.LogError("LeaderBoard reference is null - score not saved!");
+        }
+
+        uiManager.ShowResultPanel(true, maxRounds, totalPoints, maxRounds * 3);
         audioSource.PlayOneShot(endGameSound, 1);
     }
 }

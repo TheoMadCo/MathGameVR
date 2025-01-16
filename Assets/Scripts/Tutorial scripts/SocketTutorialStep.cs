@@ -77,11 +77,6 @@ public class SocketTutorialStep : MonoBehaviour, ITutorialStep
         {
             keySocket.selectEntered.RemoveListener(OnKeyInserted);
         }
-
-        if (spawnedSetup != null)
-        {
-            Destroy(spawnedSetup);
-        }
         ResetHighlights();
     }
 
