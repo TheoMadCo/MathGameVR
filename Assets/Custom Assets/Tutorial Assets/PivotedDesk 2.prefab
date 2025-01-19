@@ -1558,7 +1558,7 @@ Transform:
   m_GameObject: {fileID: 2278493469962393072}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.8327, y: 0.1313, z: -0.4249}
+  m_LocalPosition: {x: 0.833, y: 0.1313, z: -0.413}
   m_LocalScale: {x: 1.1061, y: 1.1061, z: 0.60423696}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -51041,7 +51041,7 @@ GameObject:
   - component: {fileID: 3207776365532519779}
   - component: {fileID: 6708416043402772502}
   m_Layer: 0
-  m_Name: BinCanva
+  m_Name: SocketCanva
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -51320,7 +51320,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Rilascia un oggetto qui sopra per attaccarlo
+  m_text: Rilascia un oggetto sopra il cubo giallo per attaccarlo
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}

@@ -16,6 +16,7 @@ public class SocketTutorialStep : MonoBehaviour, ITutorialStep
     public Transform setupSpawnPoint;
     public XROrigin xrRig;
     public XRSocketInteractor keySocket;
+    public UnityEngine.UI.Button resetButton; 
 
     [Header("Prefab")]
     public GameObject tableWithKeyPrefab;
@@ -59,6 +60,12 @@ public class SocketTutorialStep : MonoBehaviour, ITutorialStep
             keySocket.selectEntered.AddListener(OnKeyInserted);
         }
 
+        // Wire up the reset button
+        if (resetButton != null)
+        {
+            resetButton.onClick.AddListener(ResetTableSetup);
+        }
+
         // Find controller references
         leftControllerHighlight = null;
         rightControllerHighlight = null;
@@ -78,6 +85,12 @@ public class SocketTutorialStep : MonoBehaviour, ITutorialStep
             keySocket.selectEntered.RemoveListener(OnKeyInserted);
         }
         ResetHighlights();
+
+        // Clean up the reset button listener
+        if (resetButton != null)
+        {
+            resetButton.onClick.RemoveListener(ResetTableSetup);
+        }
     }
 
     private void HighlightController()
@@ -168,6 +181,21 @@ public class SocketTutorialStep : MonoBehaviour, ITutorialStep
             // Notify the manager to proceed to the next step
             tutorialManager.ProceedToNextStep();
         }
+    }
+
+    private void ResetTableSetup()
+    {
+        // Destroy the current setup if it exists
+        if (spawnedSetup != null)
+        {
+            Destroy(spawnedSetup);
+        }
+
+        // Spawn a new setup using the existing SpawnTableSetup function
+        SpawnTableSetup();
+
+        // Play a sound effect to indicate reset (optional)
+        soundEffects?.PlayNewRoundSound();
     }
 
 

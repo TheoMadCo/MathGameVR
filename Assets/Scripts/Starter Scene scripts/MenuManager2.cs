@@ -11,6 +11,10 @@ public class MenuManager2 : MonoBehaviour
     public GameObject difficultySelectionBackground;
     public GameObject confirmPlayBackground;
 
+    [Header("Audio")]
+    public AudioSource buttonAudioSource; // Reference to the AudioSource component
+    public AudioClip buttonClickSound;    // The sound clip to play
+
     private string selectedGame; // Stores the selected game (Fraction or Ordering)
     private string selectedOperation; // Stores the selected fraction operation (Addition, Subtraction, etc.)
     private string selectedDifficulty; // Stores the selected difficulty (Easy, Medium, Hard)
@@ -19,8 +23,38 @@ public class MenuManager2 : MonoBehaviour
 
     void Start()
     {
-        // Start by showing the Welcome screen
-        ShowWelcomeScreen();
+        // Clear the navigation stack at start
+        navigationStack.Clear();
+
+        // Check if we're returning from a game
+        if (PlayerPrefs.HasKey("ReturnToGameSelection") && PlayerPrefs.GetInt("ReturnToGameSelection") == 1)
+        {
+            // Clear the flag
+            PlayerPrefs.DeleteKey("ReturnToGameSelection");
+            // Show game selection screen instead of welcome screen
+            SetActiveScreen(gameSelectionBackground);
+            // Important: Add both screens to the stack in the correct order
+            navigationStack.Push(welcomeBackground);
+            navigationStack.Push(gameSelectionBackground);
+        }
+        else
+        {
+            // Normal start - show welcome screen
+            ShowWelcomeScreen();
+            // Add welcome screen to the stack
+            navigationStack.Push(welcomeBackground);
+        }
+    }
+
+    public void PlayButtonSound()
+    {
+        if (buttonAudioSource != null && buttonClickSound != null)
+        {
+            // Stop any currently playing sound and play the new one
+            buttonAudioSource.Stop();
+            buttonAudioSource.clip = buttonClickSound;
+            buttonAudioSource.Play();
+        }
     }
 
     // Show the Welcome Screen
@@ -33,12 +67,14 @@ public class MenuManager2 : MonoBehaviour
     public void OnPlayPressed()
     {
         SetActiveScreen(gameSelectionBackground);
+        PlayButtonSound();
     }
 
     // Function for selecting FractionGame or OrderingGame
     // Function for selecting FractionGame, OrderingGame, or CompleteOperation
     public void OnSelectGame(string game)
     {
+        PlayButtonSound();
         selectedGame = game;
 
         if (selectedGame == "FractionGame")
@@ -59,6 +95,7 @@ public class MenuManager2 : MonoBehaviour
     // Function for selecting a fraction operation or CompleteOperation
     public void OnSelectOperation(string operation)
     {
+        PlayButtonSound();
         selectedOperation = operation;
         SetActiveScreen(difficultySelectionBackground); // Move to difficulty selection after choosing operation
     }
@@ -66,6 +103,7 @@ public class MenuManager2 : MonoBehaviour
     // Function for selecting a difficulty (common for both games)
     public void OnSelectDifficulty(string difficulty)
     {
+        PlayButtonSound();
         selectedDifficulty = difficulty;
         SetActiveScreen(confirmPlayBackground); // Move to confirmation screen after selecting difficulty
     }
@@ -73,12 +111,14 @@ public class MenuManager2 : MonoBehaviour
     // Functio to load the tutorial scene
     public void OnTutorialPressed()
     {
+        PlayButtonSound();
         SceneManager.LoadScene("TutorialScene1");
     }
 
     // Function to confirm and start the game
     public void OnConfirmPlay()
     {
+        PlayButtonSound();
         if (!string.IsNullOrEmpty(selectedGame) && !string.IsNullOrEmpty(selectedDifficulty))
         {
             // Pass the difficulty and game-specific parameters to the next scene
@@ -109,11 +149,31 @@ public class MenuManager2 : MonoBehaviour
     // Function to handle the back button using the navigation stack
     public void OnBackPressed()
     {
-        if (navigationStack.Count > 1) // Ensure there is a previous screen to go back to
+        PlayButtonSound();
+        Debug.Log($"Stack count: {navigationStack.Count}"); // Debug log
+
+        // Special case: If we're on game selection after returning from a game
+        if (gameSelectionBackground.activeSelf && PlayerPrefs.HasKey("ReturnToGameSelection"))
         {
+            Debug.Log("Handling special case back button"); // Debug log
+            PlayerPrefs.DeleteKey("ReturnToGameSelection");
+            SetActiveScreen(welcomeBackground);
+            navigationStack.Clear();
+            navigationStack.Push(welcomeBackground);
+            return;
+        }
+
+        // Normal back button behavior
+        if (navigationStack.Count > 1)
+        {
+            Debug.Log("Handling normal back button"); // Debug log
             navigationStack.Pop(); // Remove the current screen
             GameObject previousScreen = navigationStack.Peek(); // Get the previous screen
-            SetActiveScreen(previousScreen, false); // Display the previous screen without pushing it back to the stack
+            SetActiveScreen(previousScreen, false); // Display the previous screen without pushing it to the stack
+        }
+        else
+        {
+            Debug.Log("Not enough screens in stack to go back"); // Debug log
         }
     }
 
@@ -136,6 +196,7 @@ public class MenuManager2 : MonoBehaviour
     // Quit the game from the Welcome screen
     public void OnExitPressed()
     {
+        PlayButtonSound();
         Application.Quit();
     }
 

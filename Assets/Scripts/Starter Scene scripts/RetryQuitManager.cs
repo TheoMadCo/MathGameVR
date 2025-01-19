@@ -21,6 +21,9 @@ public class RetryQuitManager : MonoBehaviour
         PlayerPrefs.DeleteKey("Operation");
         PlayerPrefs.DeleteKey("Difficulty");
 
+        // Set a flag to indicate we're returning from a game
+        PlayerPrefs.SetInt("ReturnToGameSelection", 1);
+
         Debug.Log("Returning to starter scene. PlayerPrefs cleared for Operation and Difficulty.");
         SceneManager.LoadScene("StarterSceneClassroom");
     }
