@@ -164,9 +164,8 @@ public class SocketTutorialStep : MonoBehaviour, ITutorialStep
     {
         instructionText.text = "Puoi anche posizionare gli oggetti in degli appositi slot:\n\n" +
             "1. Ad esempio, <color=#0fd1cb>trova la chiave</color> nascosta e raccoglila\n" +
-            "2. Una volta presa in mano, <color=#0fd1cb>cerca la serratura</color> sulla porta\n" +
-            "3. Avvicina la chiave alla serratura, rilascia la presa e vedrai la chiave entrare nella serratura!\n"+
-            "4. Una volta inserita la chiave, <color=#0fd1cb>Ritorna di fronte alla lavagna!</color>\n\n" +
+            "2. Una volta presa in mano, <color=#0fd1cb>cerca la serratura</color> sulla porta e avvicinati con il <color=#0fd1cb>teletrasporto</color> \n" +
+            "3. <color=#0fd1cb>Avvicina la chiave alla serratura</color>, rilascia la presa e vedrai la chiave entrare!\n\n" +
             "Completa questi passaggi per terminare il tutorial!";
     }
 
