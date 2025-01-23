@@ -41,11 +41,11 @@ public class UIManager_CompleteOperation : MonoBehaviour
     };
 
     private string[] loseMessages = new string[] {
-        "Non arrenderti! Ricontrolla le caselle evidenziate in rosso",
-        "Continua a provare! Guarda bene i numeri nelle caselle rosse",
-        "Riprova! Dai una occhiata alle caselle rosse",
-        "Ci sei quasi! Guarda bene le caselle rosse ",
-        "Non mollare! Ritenta e guarda bene le caselle rosse"
+        "Non arrenderti! Ricontrolla le caselle evidenziate in <color=#CF5441>rosso</color>",
+        "Continua a provare! Guarda bene i numeri nelle <color=#CF5441>caselle rosse</color>",
+        "Riprova! Dai una occhiata alle <color=#CF5441>caselle rosse</color>",
+        "Ci sei quasi! Guarda bene le <color=#CF5441>caselle rosse</color>",
+        "Non mollare! Ritenta e guarda bene le <color=#CF5441>caselle rosse</color>"
     };
 
     private string[] complimentMessages = new string[] {
@@ -110,7 +110,7 @@ public class UIManager_CompleteOperation : MonoBehaviour
     // Updates the display text for score or operations completed
     public void UpdateDisplayText(int completedTasks, int totalTasks)
     {
-        scoreText.text = $"Hai completato {completedTasks} operazioni su {totalTasks}.\n\n Ti rimangono {totalTasks - completedTasks} operazioni da completare!";
+        scoreText.text = $"Ti rimangono {totalTasks - completedTasks} operazioni da completare!";
     }
 
     // Displays the final score with the number of completed tasks

@@ -12,7 +12,7 @@ public class OperationGenerator : MonoBehaviour
 
     private Difficulty currentDifficulty;  // Set by GameManager
 
-    public string OperationString => $"{LeftOperand} {GetOperatorSymbol()} {RightOperand} =";
+    public string OperationString => $"{LeftOperand} {GetOperatorSymbol()} {RightOperand}";
 
 
     void Start()
