@@ -10,7 +10,15 @@ public class TutorialSoundEffects : MonoBehaviour {
     public AudioClip loseSound;         // Sound played when losing
     public AudioClip newRoundSound;     // Sound played when winning
     public AudioClip endGameSound;      // Sound played when losing
-    
+
+    [Header("Audio instructions")]
+    public AudioSource VoiceAudioSource;     // Audio source component for voice
+    public AudioClip UIInstructions;
+    public AudioClip MovementInstructions;
+    public AudioClip grabbingInstructions;
+    public AudioClip socketInstructions;
+
+
     public void PlayNewRoundSound()
     {
         audioSource.PlayOneShot(newRoundSound);
@@ -28,5 +36,25 @@ public class TutorialSoundEffects : MonoBehaviour {
     public void PlayEndGameSound()
     {
         audioSource.PlayOneShot(endGameSound);
+    }
+
+    public void PlayUIInstructions()
+    {
+        audioSource.PlayOneShot(UIInstructions);
+    }
+
+    public void PlayMovementInstructions()
+    {
+        audioSource.PlayOneShot(MovementInstructions);
+    }
+
+    public void PlayGrabbingInstructions()
+    {
+        audioSource.PlayOneShot(grabbingInstructions);
+    }
+
+    public void PlaySocketInstructions()
+    {
+        audioSource.PlayOneShot(socketInstructions);
     }
 }

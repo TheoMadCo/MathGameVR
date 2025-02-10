@@ -40,6 +40,10 @@ public class MovementTutorialStep : MonoBehaviour, ITutorialStep
     {
         tutorialManager = manager;
 
+        soundEffects?.PlayNewRoundSound();
+        // Play audio instructions
+        soundEffects?.PlayMovementInstructions();
+
         // Teleport the player
         TeleportPlayer();
 
@@ -124,8 +128,8 @@ public class MovementTutorialStep : MonoBehaviour, ITutorialStep
 
     private void ShowMovementInstructions()
     {
-        instructionText.text = "Ora impariamo come muoverci:\n\n" +
-            "1. Punta il controller sul pavimento, vedrai un arco <color=#0fd1cb>Azzurro</color>\n" +
+        instructionText.text = "Ora impariamo come spostarci:\n\n" +
+            "1. Punta il controller sul pavimento, vedrai il raggio <color=#0fd1cb>Azzurro</color>\n" +
             "2. Scegli un punto dove vuoi <color=#0fd1cb>teletrasportarti</color>\n" +
             "3. Premi il <color=#0fd1cb>grilletto lampeggiante</color> sotto il tuo dito medio per teletrasportati nel punto indicato\n\n" +
             "Fai pratica con il movimento. Premi su continua per proseguire il tutorial.";

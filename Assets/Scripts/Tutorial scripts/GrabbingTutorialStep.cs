@@ -48,6 +48,10 @@ public class GrabbingTutorialStep : MonoBehaviour, ITutorialStep
         // Enable the canvas for this step
         grabbingTutorialCanvas.enabled = true;
 
+        soundEffects?.PlayNewRoundSound();
+        // Play audio instructions
+        soundEffects?.PlayGrabbingInstructions();
+
         // Teleport the player and set up the environment
         TeleportPlayer();
         SpawnTableSetup();
@@ -152,7 +156,7 @@ public class GrabbingTutorialStep : MonoBehaviour, ITutorialStep
     private void ShowGrabbingInstructions()
     {
         instructionText.text = "Puoi anche afferrare gli oggetti!\n\n" +
-            "1. Punta il controller su un oggetto, vedrai la linea <color=#0fd1cb>Blu</color>\n" +
+            "1. Punta il controller su un oggetto, vedrai il raggio <color=#0fd1cb>Azzurro</color>\n" +
             "2. Tieni premuto il <color=#0fd1cb>grilletto lampeggiante</color> sotto il tuo dito medio per afferrarlo\n" +
             "3. Ora puoi usare le <color=#0fd1cb>levette lampeggianti</color> per ruotarlo e muoverlo avanti e indietro!\n\n" +
             "Puoi anche avvicinarti con la mano e afferrarlo come se fosse reale.\n" +

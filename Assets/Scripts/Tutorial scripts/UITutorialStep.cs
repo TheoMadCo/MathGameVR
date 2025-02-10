@@ -48,14 +48,17 @@ public class UITutorialStep : MonoBehaviour, ITutorialStep
     public void StartStep(TutorialManager manager)
     {
         tutorialManager = manager;
+
         soundEffects?.PlayNewRoundSound();
+        // Play audio instructions
+        soundEffects?.PlayUIInstructions();
 
         practiceButtonImage = practiceButton.GetComponent<Image>();
 
         // Setup initial state
         tutorialCanvas.enabled = true;
         continueButton.gameObject.SetActive(false);
-        instructionText.text = "In questo Tutorial imparerai a muoverti nel gioco\r\n\r\nLa prima cosa da imparare è come usare i bottoni. \r\n<color=#0fd1cb>Guarda la tua mano</color>.\nPunta il bottone con il raggio e quando diventerà <color=#0fd1cb>blu</color>,\n usa il <color=#0fd1cb>grilletto lampeggiante</color> sotto il tuo indice per cliccarlo.";
+        instructionText.text = "In questo Tutorial imparerai a muoverti nel gioco\r\n\r\nLa prima cosa da imparare è come usare i bottoni. \r\n<color=#0fd1cb>Guarda la tua mano</color>.\nPunta il bottone con il raggio e quando diventerà <color=#0fd1cb>azzurro</color>,\n usa il <color=#0fd1cb>grilletto lampeggiante</color> sotto il tuo indice per cliccarlo.";
 
         practiceButton.onClick.AddListener(OnPracticeButtonClick);
         continueButton.onClick.AddListener(OnContinueButtonClick);
