@@ -61,6 +61,23 @@ public class GameManager_operationGame : MonoBehaviour
             Debug.LogError("LeaderBoard_operationGame reference not set in inspector!");
         }
 
+        // Set the number of turns based on the selected operation and difficulty
+        if (selectedOperation == "Multiplication")
+        {
+            switch (selectedDifficulty)
+            {
+                case "Easy":
+                    maxRounds = 3;
+                    break;
+                case "Medium":
+                    maxRounds = 5;
+                    break;
+                case "Hard":
+                    maxRounds = 8;
+                    break;
+            }
+        }
+
         GenerateQuestion();
     }
 
@@ -221,15 +238,15 @@ public class GameManager_operationGame : MonoBehaviour
         {
             case "Easy":
                 // Easy: Multiplication with tables up to 10, fully random wrong answers
-                a = Random.Range(0, 11);
-                b = Random.Range(0, 11);
+                a = Random.Range(1, 11);
+                b = Random.Range(1, 11);
                 correctAnswer = a * b;
-                uiManager.DisplayQuestion($"{a} * {b} = ?");
+                uiManager.DisplayQuestion($"{a} x {b} = ?");
 
                 answers.Add(correctAnswer);
                 while (answers.Count < 3)
                 {
-                    int wrongAnswer = Random.Range(0, 121); // Max possible product of 10 * 11
+                    int wrongAnswer = Random.Range(1, 121); // Max possible product of 10 * 11
                     if (!answers.Contains(wrongAnswer))
                     {
                         answers.Add(wrongAnswer);
@@ -240,10 +257,10 @@ public class GameManager_operationGame : MonoBehaviour
             case "Medium":
             case "Hard":
                 // Medium/Hard: Multiplication with tables up to 10, one wrong answer with same units digit
-                a = Random.Range(0, 11);
-                b = Random.Range(0, 11);
+                a = Random.Range(1, 11);
+                b = Random.Range(1, 11);
                 correctAnswer = a * b;
-                uiManager.DisplayQuestion($"{a} * {b} = ?");
+                uiManager.DisplayQuestion($"{a} x {b} = ?");
 
                 answers.Add(correctAnswer);
 
@@ -260,7 +277,7 @@ public class GameManager_operationGame : MonoBehaviour
                 int completelyRandomWrongAnswer;
                 do
                 {
-                    completelyRandomWrongAnswer = Random.Range(0, 121);
+                    completelyRandomWrongAnswer = Random.Range(1, 121);
                 } while (answers.Contains(completelyRandomWrongAnswer));
                 answers.Add(completelyRandomWrongAnswer);
                 break;

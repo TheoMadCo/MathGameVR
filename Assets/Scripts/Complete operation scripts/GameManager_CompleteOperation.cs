@@ -53,6 +53,23 @@ public class GameManager_CompleteOperation : MonoBehaviour
         stopwatch = new Stopwatch();
         stopwatch.Start();
 
+        // Set the number of tasks based on the selected operation and difficulty
+        if (operationType == OperationType.Multiplication)
+        {
+            switch (difficulty)
+            {
+                case Difficulty.Easy:
+                    totalTasks = 3;
+                    break;
+                case Difficulty.Medium:
+                    totalTasks = 5;
+                    break;
+                case Difficulty.Hard:
+                    totalTasks = 8;
+                    break;
+            }
+        }
+
         // Generate and display the first operation
         GenerateNewOperation();
 

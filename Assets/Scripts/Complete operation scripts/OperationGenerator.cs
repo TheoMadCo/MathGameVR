@@ -55,7 +55,7 @@ public class OperationGenerator : MonoBehaviour
 
             case OperationType.Multiplication:
                 GenerateMultiplication();
-                operatorText.text = "×";
+                operatorText.text = "x";
                 break;
         }
 
@@ -133,9 +133,18 @@ public class OperationGenerator : MonoBehaviour
 
     private void GenerateMultiplication()
     {
-        // Multiplication remains unchanged for all difficulties
-        LeftOperand = Random.Range(2, 9);  // Single-digit numbers
-        RightOperand = Random.Range(2, 9);
+        switch (currentDifficulty)
+        {
+            case Difficulty.Easy:
+            case Difficulty.Medium:
+                LeftOperand = Random.Range(1, 9);  // Single-digit numbers
+                RightOperand = Random.Range(1, 9);
+                break;
+            case Difficulty.Hard:
+                LeftOperand = Random.Range(1, 10);  // Numbers up to 10, since in hard mode, the result can be up to 100
+                RightOperand = Random.Range(1, 10);
+                break;
+        }
         Result = LeftOperand * RightOperand;
     }
 
@@ -158,7 +167,7 @@ private string GetOperatorSymbol()
         {
             case OperationType.Addition: return "+";
             case OperationType.Subtraction: return "-";
-            case OperationType.Multiplication: return "×";
+            case OperationType.Multiplication: return "x";
             default: return "?";
         }
     }
